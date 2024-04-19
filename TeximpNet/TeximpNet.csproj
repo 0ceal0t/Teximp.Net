@@ -7,7 +7,7 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <SignAssembly Condition=" '$(MSBuildRuntimeType)' != 'Core'">true</SignAssembly>
     <AssemblyOriginatorKeyFile Condition=" '$(MSBuildRuntimeType)' != 'Core'">TeximpKey.snk</AssemblyOriginatorKeyFile>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
     <Authors>Nicholas Woodfield</Authors>
     <Company />
     <Version>1.5.0</Version>
@@ -18,7 +18,7 @@
     <RepositoryUrl>https://bitbucket.org/Starnick/teximpnet.git</RepositoryUrl>
     <RepositoryType>Git</RepositoryType>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
-    <IncludeSymbols>true</IncludeSymbols>
+    <IncludeSymbols>False</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <Description>A .NET texture IO and processing library that wraps the FreeImage and Nvidia Texture Tools libraries. The library is able to import and export dozens of image formats, create mipmap chains, and compress textures for GPUs. This release targets version 3.18.0 of FreeImage and a (modified) version 2.1.1 of NVTT.</Description>
     <PackageTags>Importers 3D Graphics Content Assets Texture Cubemap Image Compression DDS DXT BMP JPG JPEG TGA PNG GIF RAW TIFF</PackageTags>
@@ -31,22 +31,6 @@
     <DebugType>portable</DebugType>
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
-
-  <ItemGroup>
-    <Content Include="..\logo.png" Link="nuget\logo.png" PackagePath="" />
-    <Content Include="..\ChangeLog.txt" Link="nuget\ChangeLog.txt" PackagePath="" />
-    <Content Include="..\License.txt" Link="nuget\License.txt" PackagePath="" />
-    <Content Include="..\Docs\TeximpNet Documentation %28September 2019%29.chm" Link="nuget\TeximpNet Documentation %28September 2019%29.chm" PackagePath="" />
-    <Content Include="..\libs\FreeImage\win-x64\FreeImage.dll" Link="nuget\runtimes\win-x64\native\FreeImage.dll" PackagePath="runtimes\win-x64\native" />
-    <Content Include="..\libs\FreeImage\win-x86\FreeImage.dll" Link="nuget\runtimes\win-x86\native\FreeImage.dll" PackagePath="runtimes\win-x86\native" />
-    <Content Include="..\libs\FreeImage\linux-x64\libFreeImage.so" Link="nuget\runtimes\linux-x64\native\libFreeImage.so" PackagePath="runtimes\linux-x64\native" />
-    <Content Include="..\libs\FreeImage\osx-x64\libFreeImage.dylib" Link="nuget\runtimes\osx-x64\native\libFreeImage.dylib" PackagePath="runtimes\osx-x64\native" />
-    <Content Include="..\libs\NvidiaTextureTools\win-x64\nvtt.dll" Link="nuget\runtimes\win-x64\native\nvtt.dll" PackagePath="runtimes\win-x64\native" />
-    <Content Include="..\libs\NvidiaTextureTools\win-x86\nvtt.dll" Link="nuget\runtimes\win-x86\native\nvtt.dll" PackagePath="runtimes\win-x86\native" />
-    <Content Include="..\libs\NvidiaTextureTools\linux-x64\libnvtt.so" Link="nuget\runtimes\linux-x64\native\libnvtt.so" PackagePath="runtimes\linux-x64\native" />
-    <Content Include="..\libs\NvidiaTextureTools\osx-x64\libnvtt.dylib" Link="nuget\runtimes\osx-x64\native\libnvtt.dylib" PackagePath="runtimes\osx-x64\native" />
-    <Content Include="TeximpNet.targets" Link="nuget\build\TeximpNet.targets" PackagePath="build" />
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="MemoryInterop.ILPatcher" Version="2.2.1">

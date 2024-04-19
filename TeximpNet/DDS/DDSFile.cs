@@ -807,12 +807,12 @@ namespace TeximpNet.DDS {
             }
 
             //Write out magic word, DDS header, and optionally extended header
-            buffer?.Write( output, DDS_MAGIC );
-            buffer?.Write( output, header );
+            buffer.Write( output, DDS_MAGIC );
+            buffer.Write( output, header );
 
             if( header10.HasValue ) {
                 System.Diagnostics.Debug.Assert( header.PixelFormat.IsDX10Extended );
-                buffer?.Write( output, header10.Value );
+                buffer.Write( output, header10.Value );
             }
 
             return true;
