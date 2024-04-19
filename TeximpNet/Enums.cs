@@ -22,13 +22,11 @@
 
 using System;
 
-namespace TeximpNet
-{
+namespace TeximpNet {
     /// <summary>
     /// Enumerates the type of an image.
     /// </summary>
-    public enum ImageType
-    {
+    public enum ImageType {
         /// <summary>
         /// Unknown type. Returned value only, never use as an input value.
         /// </summary>
@@ -98,8 +96,7 @@ namespace TeximpNet
     /// <summary>
     /// Enumerates file formats that can be loaded / saved.
     /// </summary>
-    public enum ImageFormat
-    {
+    public enum ImageFormat {
         /// <summary>
         /// Unknown. Returned value only, never use as an input value.
         /// </summary>
@@ -302,8 +299,7 @@ namespace TeximpNet
     /// that is to be loaded, then that option will be ignored.
     /// </summary>
     [Flags]
-    public enum ImageLoadFlags
-    {
+    public enum ImageLoadFlags {
         /// <summary>
         /// Default loading procedure.
         /// </summary>
@@ -418,8 +414,7 @@ namespace TeximpNet
     /// that is to be saved, then that option will be ignored.
     /// </summary>
     [Flags]
-    public enum ImageSaveFlags
-    {
+    public enum ImageSaveFlags {
         /// <summary>
         /// Default saving procedure.
         /// </summary>
@@ -458,7 +453,7 @@ namespace TeximpNet
         EXR_PXR24 = 16,
 
         /// <summary>
-        /// Save EXR format with lossy 44% float compression - goes to 22% when combined with <see cref="ImageSaveFlags.EXR_LC"/>.
+        /// Save EXR format with lossy 44% float compression - goes to 22% when combined with <see cref="EXR_LC"/>.
         /// </summary>
         EXR_B44 = 32,
 
@@ -643,8 +638,7 @@ namespace TeximpNet
     /// <summary>
     /// Enumerates image color models.
     /// </summary>
-    public enum ImageColorType
-    {
+    public enum ImageColorType {
         /// <summary>
         /// Minimum value is white.
         /// </summary>
@@ -679,8 +673,7 @@ namespace TeximpNet
     /// <summary>
     /// Enumerates image filters used only in FreeImage (and NOT the Compression API).
     /// </summary>
-    public enum ImageFilter
-    {
+    public enum ImageFilter {
         /// <summary>
         /// Box, pulse, Fourier window, 1st order (constant) b-spline
         /// </summary>
@@ -715,8 +708,7 @@ namespace TeximpNet
     /// <summary>
     /// Enumerates types of image conversions.
     /// </summary>
-    public enum ImageConversion
-    {
+    public enum ImageConversion {
         /// <summary>
         /// Converts a bitmap to 4 bits. If the bitmap was a high-color bitmap
         /// (16, 24, or 32-bit) or if it was a monochrome or greyscale bitmap (1 or 8-bit), the end result

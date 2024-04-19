@@ -23,15 +23,13 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace TeximpNet
-{
+namespace TeximpNet {
     /// <summary>
     /// Represents a four character code (32-bit unsigned integer), usually used as a "magic number" to identify the contents of a file format.
     /// </summary>
-    [StructLayout(LayoutKind.Sequential, Size = 4)]
-    internal struct FourCC : IEquatable<FourCC>
-    {
-        private static readonly FourCC s_empty = new FourCC(0);
+    [StructLayout( LayoutKind.Sequential, Size = 4 )]
+    internal struct FourCC : IEquatable<FourCC> {
+        private static readonly FourCC s_empty = new( 0 );
         private static readonly int s_sizeInBytes = MemoryHelper.SizeOf<FourCC>();
 
         private uint m_packedValue;
@@ -39,10 +37,8 @@ namespace TeximpNet
         /// <summary>
         /// Gets the empty (a value of zero) four character code.
         /// </summary>
-        public static FourCC Empty
-        {
-            get
-            {
+        public static FourCC Empty {
+            get {
                 return s_empty;
             }
         }
@@ -50,10 +46,8 @@ namespace TeximpNet
         /// <summary>
         /// Gets the size of the <see cref="FourCC"/> structure in bytes.
         /// </summary>
-        public static int SizeInBytes
-        {
-            get
-            {
+        public static int SizeInBytes {
+            get {
                 return s_sizeInBytes;
             }
         }
@@ -61,44 +55,36 @@ namespace TeximpNet
         /// <summary>
         /// Gets the first character.
         /// </summary>
-        public char First
-        {
-            get
-            {
-                return (char) (m_packedValue & 255);
+        public char First {
+            get {
+                return ( char )( m_packedValue & 255 );
             }
         }
 
         /// <summary>
         /// Gets the second character.
         /// </summary>
-        public char Second
-        {
-            get
-            {
-                return (char) ((m_packedValue >> 8) & 255);
+        public char Second {
+            get {
+                return ( char )( ( m_packedValue >> 8 ) & 255 );
             }
         }
 
         /// <summary>
         /// Gets the third character.
         /// </summary>
-        public char Third
-        {
-            get
-            {
-                return (char) ((m_packedValue >> 16) & 255);
+        public char Third {
+            get {
+                return ( char )( ( m_packedValue >> 16 ) & 255 );
             }
         }
 
         /// <summary>
         /// Gets the fourth character.
         /// </summary>
-        public char Fourth
-        {
-            get
-            {
-                return (char) ((m_packedValue >> 24) & 255);
+        public char Fourth {
+            get {
+                return ( char )( ( m_packedValue >> 24 ) & 255 );
             }
         }
 
@@ -106,18 +92,15 @@ namespace TeximpNet
         /// Constructs a new instance of the <see cref="FourCC"/> struct.
         /// </summary>
         /// <param name="fourCharacterCode">The string representation of a four character code.</param>
-        /// <exception cref="System.ArgumentOutOfRangeException">Thrown if the string representing a four character code does not infact have four characters.</exception>
-        public FourCC(String fourCharacterCode)
-        {
-            if(fourCharacterCode != null)
-            {
-                if(fourCharacterCode.Length != 4)
-                    throw new ArgumentOutOfRangeException("fourCharacterCode", "FourCC must have four characters only.");
+        /// <exception cref="ArgumentOutOfRangeException">Thrown if the string representing a four character code does not infact have four characters.</exception>
+        public FourCC( string fourCharacterCode ) {
+            if( fourCharacterCode != null ) {
+                if( fourCharacterCode.Length != 4 )
+                    throw new ArgumentOutOfRangeException( "fourCharacterCode", "FourCC must have four characters only." );
 
-                m_packedValue = (uint) ((fourCharacterCode[3] << 24) | (fourCharacterCode[2] << 16) | (fourCharacterCode[1] << 8) | fourCharacterCode[0]);
+                m_packedValue = ( uint )( ( fourCharacterCode[3] << 24 ) | ( fourCharacterCode[2] << 16 ) | ( fourCharacterCode[1] << 8 ) | fourCharacterCode[0] );
             }
-            else
-            {
+            else {
                 m_packedValue = 0;
             }
         }
@@ -129,17 +112,15 @@ namespace TeximpNet
         /// <param name="second">Second character</param>
         /// <param name="third">Third character</param>
         /// <param name="fourth">Fourth character</param>
-        public FourCC(char first, char second, char third, char fourth)
-        {
-            m_packedValue = (uint) ((((fourth << 24) | (third << 16)) | (second << 8)) | first);
+        public FourCC( char first, char second, char third, char fourth ) {
+            m_packedValue = ( uint )( ( ( ( fourth << 24 ) | ( third << 16 ) ) | ( second << 8 ) ) | first );
         }
 
         /// <summary>
         /// Constructs a new instance of the <see cref="FourCC"/> struct.
         /// </summary>
         /// <param name="packedValue">Packed value represent the four character code.</param>
-        public FourCC(uint packedValue)
-        {
+        public FourCC( uint packedValue ) {
             m_packedValue = packedValue;
         }
 
@@ -147,9 +128,8 @@ namespace TeximpNet
         /// Constructs a new instance of the <see cref="FourCC"/> struct.
         /// </summary>
         /// <param name="packedValue">Packed value represent the four character code.</param>
-        public FourCC(int packedValue)
-        {
-            m_packedValue = (uint) packedValue;
+        public FourCC( int packedValue ) {
+            m_packedValue = ( uint )packedValue;
         }
 
         /// <summary>
@@ -157,8 +137,7 @@ namespace TeximpNet
         /// </summary>
         /// <param name="fourCharacterCode">Character code</param>
         /// <returns>Unsigned integer representation.</returns>
-        public static implicit operator uint(FourCC fourCharacterCode)
-        {
+        public static implicit operator uint( FourCC fourCharacterCode ) {
             return fourCharacterCode.m_packedValue;
         }
 
@@ -167,9 +146,8 @@ namespace TeximpNet
         /// </summary>
         /// <param name="fourCharacterCode">Character code</param>
         /// <returns>Integer representation</returns>
-        public static implicit operator int(FourCC fourCharacterCode)
-        {
-            return (int) fourCharacterCode.m_packedValue;
+        public static implicit operator int( FourCC fourCharacterCode ) {
+            return ( int )fourCharacterCode.m_packedValue;
         }
 
         /// <summary>
@@ -177,9 +155,8 @@ namespace TeximpNet
         /// </summary>
         /// <param name="fourCharacterCode">Character code</param>
         /// <returns>String representation</returns>
-        public static implicit operator String(FourCC fourCharacterCode)
-        {
-            return new String(new char[] { fourCharacterCode.First, fourCharacterCode.Second, fourCharacterCode.Third, fourCharacterCode.Fourth });
+        public static implicit operator string( FourCC fourCharacterCode ) {
+            return new string( new char[] { fourCharacterCode.First, fourCharacterCode.Second, fourCharacterCode.Third, fourCharacterCode.Fourth } );
         }
 
         /// <summary>
@@ -187,9 +164,8 @@ namespace TeximpNet
         /// </summary>
         /// <param name="packedValue">Packed value representing the four character code.</param>
         /// <returns>The FourCC instance.</returns>
-        public static implicit operator FourCC(uint packedValue)
-        {
-            return new FourCC(packedValue);
+        public static implicit operator FourCC( uint packedValue ) {
+            return new FourCC( packedValue );
         }
 
         /// <summary>
@@ -197,9 +173,8 @@ namespace TeximpNet
         /// </summary>
         /// <param name="packedValue">Packed value representing the four character code.</param>
         /// <returns>The FourCC instance.</returns>
-        public static implicit operator FourCC(int packedValue)
-        {
-            return new FourCC(packedValue);
+        public static implicit operator FourCC( int packedValue ) {
+            return new FourCC( packedValue );
         }
 
         /// <summary>
@@ -207,9 +182,8 @@ namespace TeximpNet
         /// </summary>
         /// <param name="fourCharacterCode">String representing the four character code.</param>
         /// <returns>The FourCC instance.</returns>
-        public static implicit operator FourCC(String fourCharacterCode)
-        {
-            return new FourCC(fourCharacterCode);
+        public static implicit operator FourCC( string fourCharacterCode ) {
+            return new FourCC( fourCharacterCode );
         }
 
         /// <summary>
@@ -218,8 +192,7 @@ namespace TeximpNet
         /// <param name="a">First character code</param>
         /// <param name="b">Second character code</param>
         /// <returns>True if both are equal, false otherwise.</returns>
-        public static bool operator ==(FourCC a, FourCC b)
-        {
+        public static bool operator ==( FourCC a, FourCC b ) {
             return a.m_packedValue == b.m_packedValue;
         }
 
@@ -229,20 +202,18 @@ namespace TeximpNet
         /// <param name="a">First character code</param>
         /// <param name="b">Second character code</param>
         /// <returns>True if both are not equal, false otherwise.</returns>
-        public static bool operator !=(FourCC a, FourCC b)
-        {
+        public static bool operator !=( FourCC a, FourCC b ) {
             return a.m_packedValue != b.m_packedValue;
         }
 
         /// <summary>
-        /// Determines whether the specified <see cref="System.Object" /> is equal to this instance.
+        /// Determines whether the specified <see cref="object" /> is equal to this instance.
         /// </summary>
-        /// <param name="obj">The <see cref="System.Object" /> to compare with this instance.</param>
-        /// <returns>True if the specified <see cref="System.Object" /> is equal to this instance; otherwise, false.</returns>
-        public override bool Equals(object obj)
-        {
-            if(obj is FourCC)
-                return Equals((FourCC) obj);
+        /// <param name="obj">The <see cref="object" /> to compare with this instance.</param>
+        /// <returns>True if the specified <see cref="object" /> is equal to this instance; otherwise, false.</returns>
+        public override bool Equals( object obj ) {
+            if( obj is FourCC )
+                return Equals( ( FourCC )obj );
 
             return false;
         }
@@ -252,8 +223,7 @@ namespace TeximpNet
         /// </summary>
         /// <param name="other">Other character code</param>
         /// <returns>True if both are equal, false otherwise.</returns>
-        public bool Equals(FourCC other)
-        {
+        public bool Equals( FourCC other ) {
             return m_packedValue == other.m_packedValue;
         }
 
@@ -263,11 +233,9 @@ namespace TeximpNet
         /// <returns>
         /// A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table. 
         /// </returns>
-        public override int GetHashCode()
-        {
-            unchecked
-            {
-                return (int) m_packedValue;
+        public override int GetHashCode() {
+            unchecked {
+                return ( int )m_packedValue;
             }
         }
 
@@ -275,12 +243,11 @@ namespace TeximpNet
         /// Returns the fully qualified type name of this instance.
         /// </summary>
         /// <returns>A <see cref="T:System.String" /> containing a fully qualified type name.</returns>
-        public override String ToString()
-        {
-            if(m_packedValue == 0)
+        public override string ToString() {
+            if( m_packedValue == 0 )
                 return "0";
 
-            return new String(new char[] { First, Second, Third, Fourth });
+            return new string( new char[] { First, Second, Third, Fourth } );
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿/*
+/*
 * Copyright (c) 2016-2020 TeximpNet - Nicholas Woodfield
 * 
 * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -24,14 +24,12 @@ using System;
 using System.IO;
 using System.Runtime.InteropServices;
 
-namespace TeximpNet
-{
+namespace TeximpNet {
     /// <summary>
     /// A buffer that facilitates transfer between managed/unmanaged memory and <see cref="Stream"/> objects. An intermediate byte buffer is created and pinned,
     /// allow for copying between it and unmanaged memory.
     /// </summary>
-    public class StreamTransferBuffer : IDisposable
-    {
+    public class StreamTransferBuffer : IDisposable {
         private bool m_isDisposed;
         private byte[] m_buffer;
         private GCHandle m_pinHandle;
@@ -40,10 +38,8 @@ namespace TeximpNet
         /// <summary>
         /// Gets the pointer to the byte array.
         /// </summary>
-        public IntPtr Pointer
-        {
-            get
-            {
+        public IntPtr Pointer {
+            get {
                 return m_pinHandle.AddrOfPinnedObject();
             }
         }
@@ -51,10 +47,8 @@ namespace TeximpNet
         /// <summary>
         /// Gets the byte array used by the buffer.
         /// </summary>
-        public byte[] ByteArray
-        {
-            get
-            {
+        public byte[] ByteArray {
+            get {
                 return m_buffer;
             }
         }
@@ -62,10 +56,8 @@ namespace TeximpNet
         /// <summary>
         /// Gets the size of the buffer in bytes.
         /// </summary>
-        public int Length
-        {
-            get
-            {
+        public int Length {
+            get {
                 return m_buffer.Length;
             }
         }
@@ -73,10 +65,8 @@ namespace TeximpNet
         /// <summary>
         /// Gets the number of bytes last read.
         /// </summary>
-        public int LastReadByteCount
-        {
-            get
-            {
+        public int LastReadByteCount {
+            get {
                 return m_lastReadByteCount;
             }
         }
@@ -84,25 +74,23 @@ namespace TeximpNet
         /// <summary>
         /// Constructs a new instance of the <see cref="StreamTransferBuffer"/> class. The buffer size will be 81,920 bytes.
         /// </summary>
-        public StreamTransferBuffer() : this(81920) { }
+        public StreamTransferBuffer() : this( 81920 ) { }
 
         /// <summary>
         /// Constructs a new instance of the <see cref="StreamTransferBuffer"/> class.
         /// </summary>
         /// <param name="numBytes">Size of the buffer, but cannot exceed LOH allocation of 85,000 bytes unless specified.</param>
         /// <param name="avoidLOH">True to avoid Large Object Heap allocation by allocating a buffer slightly larger than 85k bytes, false to allow any sized buffer.</param>
-        public StreamTransferBuffer(int numBytes, bool avoidLOH = true)
-        {
+        public StreamTransferBuffer( int numBytes, bool avoidLOH = true ) {
             m_isDisposed = false;
-            Resize(numBytes, avoidLOH);
+            Resize( numBytes, avoidLOH );
         }
 
         /// <summary>
         /// Finalizes an instance of the <see cref="StreamTransferBuffer"/> class.
         /// </summary>
-        ~StreamTransferBuffer()
-        {
-            Dispose(false);
+        ~StreamTransferBuffer() {
+            Dispose( false );
         }
 
         /// <summary>
@@ -111,9 +99,8 @@ namespace TeximpNet
         /// <param name="input">Stream to read from.</param>
         /// <param name="numBytes">Number of bytes to read.</param>
         /// <returns>Actual read number of bytes (<see cref="LastReadByteCount"/> is also set to this).</returns>
-        public int ReadBytes(Stream input, int numBytes)
-        {
-            m_lastReadByteCount = input.Read(m_buffer, 0, numBytes);
+        public int ReadBytes( Stream input, int numBytes ) {
+            m_lastReadByteCount = input.Read( m_buffer, 0, numBytes );
             return m_lastReadByteCount;
         }
 
@@ -124,19 +111,17 @@ namespace TeximpNet
         /// <param name="input">Stream to read from.</param>
         /// <param name="value">The value to read.</param>
         /// <returns>True if the value was read from the stream, false if there was not enough bytes to read.</returns>
-        public unsafe bool Read<T>(Stream input, out T value) where T : struct
-        {
-            int size = MemoryInterop.SizeOfInline<T>();
+        public unsafe bool Read<T>( Stream input, out T value ) where T : struct {
+            var size = MemoryInterop.SizeOfInline<T>();
 
             //Fill buffer...validate we read t he expected # of bytes
-            if(ReadBytes(input, size) != size)
-            {
-                value = default(T);
+            if( ReadBytes( input, size ) != size ) {
+                value = default;
                 return false;
             }
 
             //Copy data
-            value = MemoryInterop.ReadInline<T>((void*) m_pinHandle.AddrOfPinnedObject());
+            value = MemoryInterop.ReadInline<T>( ( void* )m_pinHandle.AddrOfPinnedObject() );
             return true;
         }
 
@@ -146,16 +131,15 @@ namespace TeximpNet
         /// <typeparam name="T">Type of data to read.</typeparam>
         /// <param name="input">Stream to read from.</param>
         /// <returns>The read value.</returns>
-        public unsafe T Read<T>(Stream input) where T : struct
-        {
-            int size = MemoryInterop.SizeOfInline<T>();
+        public unsafe T Read<T>( Stream input ) where T : struct {
+            var size = MemoryInterop.SizeOfInline<T>();
 
             //Fill buffer...validate we read t he expected # of bytes
-            if(ReadBytes(input, size) != size)
-                return default(T);
+            if( ReadBytes( input, size ) != size )
+                return default;
 
             //Copy data
-            return MemoryInterop.ReadInline<T>((void*) m_pinHandle.AddrOfPinnedObject());
+            return MemoryInterop.ReadInline<T>( ( void* )m_pinHandle.AddrOfPinnedObject() );
         }
 
         /// <summary>
@@ -163,10 +147,9 @@ namespace TeximpNet
         /// </summary>
         /// <param name="output">Stream to write to.</param>
         /// <param name="numBytes">Number of bytes to write.</param>
-        public void WriteBytes(Stream output, int numBytes)
-        {
+        public void WriteBytes( Stream output, int numBytes ) {
             m_lastReadByteCount = 0;
-            output.Write(m_buffer, 0, numBytes);
+            output.Write( m_buffer, 0, numBytes );
         }
 
         /// <summary>
@@ -175,15 +158,14 @@ namespace TeximpNet
         /// <typeparam name="T">Type of data to write.</typeparam>
         /// <param name="output">Stream to write to.</param>
         /// <param name="value">Value to write.</param>
-        public unsafe void Write<T>(Stream output, in T value) where T : struct
-        {
-            int size = MemoryInterop.SizeOfInline<T>();
+        public unsafe void Write<T>( Stream output, in T value ) where T : struct {
+            var size = MemoryInterop.SizeOfInline<T>();
 
             //Fill buffer
-            MemoryInterop.WriteInline<T>((void*) m_pinHandle.AddrOfPinnedObject(), in value);
+            MemoryInterop.WriteInline( ( void* )m_pinHandle.AddrOfPinnedObject(), in value );
 
             //Write to stream
-            WriteBytes(output, size);
+            WriteBytes( output, size );
         }
 
         /// <summary>
@@ -191,44 +173,40 @@ namespace TeximpNet
         /// </summary>
         /// <param name="numBytes">Size of the buffer, but cannot exceed LOH allocation of 85,000 bytes unless specified.</param>
         /// <param name="avoidLOH">True to avoid Large Object Heap allocation by allocating a buffer slightly larger than 85k bytes, false to allow any sized buffer.</param>
-        public void Resize(int numBytes, bool avoidLOH = true)
-        {
-            if(m_isDisposed)
-                throw new ObjectDisposedException("StreamTransferBuffer");
+        public void Resize( int numBytes, bool avoidLOH = true ) {
+            if( m_isDisposed )
+                throw new ObjectDisposedException( "StreamTransferBuffer" );
 
             //If already had a buffer...ensure its unpinned
-            if(m_pinHandle.IsAllocated)
+            if( m_pinHandle.IsAllocated )
                 m_pinHandle.Free();
 
-            if(numBytes <= 0)
+            if( numBytes <= 0 )
                 numBytes = 81920;
 
             //Restrict buffer size to be less than LOH min size < 85,000 bytes
-            numBytes = (avoidLOH) ? Math.Min(numBytes, 85000) : numBytes;
+            numBytes = ( avoidLOH ) ? Math.Min( numBytes, 85000 ) : numBytes;
             m_buffer = new byte[numBytes];
-            m_pinHandle = GCHandle.Alloc(m_buffer, GCHandleType.Pinned);
+            m_pinHandle = GCHandle.Alloc( m_buffer, GCHandleType.Pinned );
             m_lastReadByteCount = 0;
         }
 
         /// <summary>
         /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
         /// </summary>
-        public void Dispose()
-        {
-            Dispose(true);
+        public void Dispose() {
+            Dispose( true );
 
-            GC.SuppressFinalize(this);
+            GC.SuppressFinalize( this );
         }
 
         /// <summary>
         /// Releases unmanaged and - optionally - managed resources.
         /// </summary>
         /// <param name="isDisposing"><c>True</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
-        protected void Dispose(bool isDisposing)
-        {
-            if(!m_isDisposed)
-            {
-                if(m_pinHandle.IsAllocated)
+        protected void Dispose( bool isDisposing ) {
+            if( !m_isDisposed ) {
+                if( m_pinHandle.IsAllocated )
                     m_pinHandle.Free();
 
                 m_buffer = null;

@@ -25,13 +25,11 @@ using System.Collections.Generic;
 using TeximpNet.Unmanaged;
 using System.IO;
 
-namespace TeximpNet
-{
+namespace TeximpNet {
     /// <summary>
     /// Represents a 2D image surface. This object wraps a FreeImage bitmap.
     /// </summary>
-    public sealed class Surface : IDisposable
-    {
+    public sealed class Surface : IDisposable {
         private IntPtr m_imagePtr;
 
         private bool m_isDisposed;
@@ -39,12 +37,10 @@ namespace TeximpNet
         /// <summary>
         /// Gets if the OS is little endian. If Big Endian, then surface data is RGBA. If little, then surface data is BGRA.
         /// </summary>
-        public static bool IsLittleEndian
-        {
-            get
-            {
-                FreeImageLibrary lib = FreeImageLibrary.Instance;
-                if (lib == null || !lib.IsLibraryLoaded)
+        public static bool IsLittleEndian {
+            get {
+                var lib = FreeImageLibrary.Instance;
+                if( lib == null || !lib.IsLibraryLoaded )
                     return true; //True for most platforms
 
                 return lib.IsLittleEndian;
@@ -59,10 +55,8 @@ namespace TeximpNet
         /// the library to use a hardcoded color order which we cannot detect. Make sure the native library is compiled
         /// with the default color order that is coupled to endianness.
         /// </remarks>
-        public static bool IsBGRAOrder
-        {
-            get
-            {
+        public static bool IsBGRAOrder {
+            get {
                 return IsLittleEndian;
             }
         }
@@ -76,21 +70,17 @@ namespace TeximpNet
         /// the library to use a hardcoded color order which we cannot detect. Make sure the native library is compiled
         /// with the default color order that is coupled to endianness.
         /// </remarks>
-        public static ColorOrder ColorOrder
-        {
-            get
-            {
-                return new ColorOrder(IsLittleEndian);
+        public static ColorOrder ColorOrder {
+            get {
+                return new ColorOrder( IsLittleEndian );
             }
         }
 
         /// <summary>
         /// Gets if the surface has been disposed or not.
         /// </summary>
-        public bool IsDisposed
-        {
-            get
-            {
+        public bool IsDisposed {
+            get {
                 return m_isDisposed;
             }
         }
@@ -98,154 +88,132 @@ namespace TeximpNet
         /// <summary>
         /// Gets the image type.
         /// </summary>
-        public ImageType ImageType
-        {
-            get
-            {
-                if(m_imagePtr == IntPtr.Zero)
+        public ImageType ImageType {
+            get {
+                if( m_imagePtr == IntPtr.Zero )
                     return ImageType.Unknown;
 
-                return FreeImageLibrary.Instance.GetImageType(m_imagePtr);
+                return FreeImageLibrary.Instance.GetImageType( m_imagePtr );
             }
         }
 
         /// <summary>
         /// Gets the number of bits per pixel. E.g. a typical RGBA bitmap would be 32 bits per pixel.
         /// </summary>
-        public int BitsPerPixel
-        {
-            get
-            {
-                if(m_imagePtr == IntPtr.Zero)
+        public int BitsPerPixel {
+            get {
+                if( m_imagePtr == IntPtr.Zero )
                     return 0;
 
-                return FreeImageLibrary.Instance.GetBitsPerPixel(m_imagePtr);
+                return FreeImageLibrary.Instance.GetBitsPerPixel( m_imagePtr );
             }
         }
 
         /// <summary>
         /// Gets the width of the image in bytes, rounded to the next 32-bit boundary. Also known as stride or scan width.
         /// </summary>
-        public int Pitch
-        {
-            get
-            {
-                if (m_imagePtr == IntPtr.Zero)
+        public int Pitch {
+            get {
+                if( m_imagePtr == IntPtr.Zero )
                     return 0;
 
-                return FreeImageLibrary.Instance.GetPitch(m_imagePtr);
+                return FreeImageLibrary.Instance.GetPitch( m_imagePtr );
             }
         }
 
         /// <summary>
         /// Gets the width of the image in texels.
         /// </summary>
-        public int Width
-        {
-            get
-            {
-                if(m_imagePtr == IntPtr.Zero)
+        public int Width {
+            get {
+                if( m_imagePtr == IntPtr.Zero )
                     return 0;
 
-                return FreeImageLibrary.Instance.GetWidth(m_imagePtr);
+                return FreeImageLibrary.Instance.GetWidth( m_imagePtr );
             }
         }
 
         /// <summary>
         /// Gets the height of the image in texels.
         /// </summary>
-        public int Height
-        {
-            get
-            {
-                if(m_imagePtr == IntPtr.Zero)
+        public int Height {
+            get {
+                if( m_imagePtr == IntPtr.Zero )
                     return 0;
 
-                return FreeImageLibrary.Instance.GetHeight(m_imagePtr);
+                return FreeImageLibrary.Instance.GetHeight( m_imagePtr );
             }
         }
 
         /// <summary>
         /// Returns the bit pattern that describes the red color component of a texel.
         /// </summary>
-        public uint RedMask
-        {
-            get
-            {
-                if(m_imagePtr == IntPtr.Zero)
+        public uint RedMask {
+            get {
+                if( m_imagePtr == IntPtr.Zero )
                     return 0;
 
-                return FreeImageLibrary.Instance.GetRedMask(m_imagePtr);
+                return FreeImageLibrary.Instance.GetRedMask( m_imagePtr );
             }
         }
 
         /// <summary>
         /// Returns the bit pattern that describes the green color component of a texel.
         /// </summary>
-        public uint GreenMask
-        {
-            get
-            {
-                if(m_imagePtr == IntPtr.Zero)
+        public uint GreenMask {
+            get {
+                if( m_imagePtr == IntPtr.Zero )
                     return 0;
 
-                return FreeImageLibrary.Instance.GetGreenMask(m_imagePtr);
+                return FreeImageLibrary.Instance.GetGreenMask( m_imagePtr );
             }
         }
 
         /// <summary>
         /// Returns the bit pattern that describes the blue color component of a texel.
         /// </summary>
-        public uint BlueMask
-        {
-            get
-            {
-                if(m_imagePtr == IntPtr.Zero)
+        public uint BlueMask {
+            get {
+                if( m_imagePtr == IntPtr.Zero )
                     return 0;
 
-                return FreeImageLibrary.Instance.GetBlueMask(m_imagePtr);
+                return FreeImageLibrary.Instance.GetBlueMask( m_imagePtr );
             }
         }
 
         /// <summary>
         /// Gets whether the image has transparency or not.
         /// </summary>
-        public bool IsTransparent
-        {
-            get
-            {
-                if (m_imagePtr == IntPtr.Zero)
+        public bool IsTransparent {
+            get {
+                if( m_imagePtr == IntPtr.Zero )
                     return false;
 
-                return FreeImageLibrary.Instance.IsTransparent(m_imagePtr);
+                return FreeImageLibrary.Instance.IsTransparent( m_imagePtr );
             }
         }
 
         /// <summary>
         /// Gets the color model of the bitmap.
         /// </summary>
-        public ImageColorType ColorType
-        {
-            get
-            {
-                if (m_imagePtr == IntPtr.Zero)
+        public ImageColorType ColorType {
+            get {
+                if( m_imagePtr == IntPtr.Zero )
                     return ImageColorType.RGBA;
 
-                return FreeImageLibrary.Instance.GetImageColorType(m_imagePtr);
+                return FreeImageLibrary.Instance.GetImageColorType( m_imagePtr );
             }
         }
 
         /// <summary>
         /// Gets a pointer to bitmap data.
         /// </summary>
-        public IntPtr DataPtr
-        {
-            get
-            {
-                if(m_imagePtr == IntPtr.Zero)
+        public IntPtr DataPtr {
+            get {
+                if( m_imagePtr == IntPtr.Zero )
                     return IntPtr.Zero;
 
-                return FreeImageLibrary.Instance.GetData(m_imagePtr);
+                return FreeImageLibrary.Instance.GetData( m_imagePtr );
             }
         }
 
@@ -253,24 +221,20 @@ namespace TeximpNet
         /// Gets a pointer to palette data. The total number of colors in the palette can be determined by <see cref="PaletteColorCount"/>. Each color is comprised of 4 bytes, one for each channel (Red, Green, Blue, Alpha). BGRA or RGBA color ordering
         /// is determined by <see cref="IsBGRAOrder"/>.
         /// </summary>
-        public IntPtr PalettePtr
-        {
-            get
-            {
-                if (m_imagePtr == IntPtr.Zero)
+        public IntPtr PalettePtr {
+            get {
+                if( m_imagePtr == IntPtr.Zero )
                     return IntPtr.Zero;
 
-                return FreeImageLibrary.Instance.GetPalette(m_imagePtr);
+                return FreeImageLibrary.Instance.GetPalette( m_imagePtr );
             }
         }
 
         /// <summary>
         /// Gets if the image has a color palette or not.
         /// </summary>
-        public bool HasPalette
-        {
-            get
-            {
+        public bool HasPalette {
+            get {
                 return PalettePtr != IntPtr.Zero;
             }
         }
@@ -278,24 +242,20 @@ namespace TeximpNet
         /// <summary>
         /// If the image uses a palette, get the number of colors in the palette. If no palette is used, this will be zero.
         /// </summary>
-        public int PaletteColorCount
-        {
-            get
-            {
-                if (m_imagePtr == IntPtr.Zero)
+        public int PaletteColorCount {
+            get {
+                if( m_imagePtr == IntPtr.Zero )
                     return 0;
 
-                return (int) FreeImageLibrary.Instance.GetPaletteColorCount(m_imagePtr);
+                return ( int )FreeImageLibrary.Instance.GetPaletteColorCount( m_imagePtr );
             }
         }
 
         /// <summary>
         /// Gets the pointer to the native FreeImage object.
         /// </summary>
-        public IntPtr NativePtr
-        {
-            get
-            {
+        public IntPtr NativePtr {
+            get {
                 return m_imagePtr;
             }
         }
@@ -306,7 +266,7 @@ namespace TeximpNet
         /// </summary>
         /// <param name="width">Width of the image.</param>
         /// <param name="height">Height of the image.</param>
-        public Surface(int width, int height) : this(32, width, height) { }
+        public Surface( int width, int height ) : this( 32, width, height ) { }
 
         /// <summary>
         /// Constructs a new instance of the <see cref="Surface"/> class. The image type will be <see cref="ImageType.Bitmap"/> that
@@ -315,7 +275,7 @@ namespace TeximpNet
         /// <param name="width">Width of the image.</param>
         /// <param name="height">Height of the image.</param>
         /// <param name="hasAlpha">If true then a 32-bit RGBA bitmap is created, if false then a 24-bit RGB bitmap is created.</param>
-        public Surface(int width, int height, bool hasAlpha) : this((hasAlpha) ? 32 : 24, width, height) { }
+        public Surface( int width, int height, bool hasAlpha ) : this( ( hasAlpha ) ? 32 : 24, width, height ) { }
 
         /// <summary>
         /// Constructs a new instance of the <see cref="Surface"/> class. The image type will be <see cref="ImageType.Bitmap"/>.
@@ -323,7 +283,7 @@ namespace TeximpNet
         /// <param name="bpp">Bit depth. Supported depth: 1-,4-,8-,16-,24-,32-bits per pixel.</param>
         /// <param name="width">Width of the image.</param>
         /// <param name="height">Height of the image.</param>
-        public Surface(int bpp, int width, int height) : this(bpp, width, height, 0, 0, 0) { }
+        public Surface( int bpp, int width, int height ) : this( bpp, width, height, 0, 0, 0 ) { }
 
         /// <summary>
         /// Constructs a new instance of the <see cref="Surface"/> class. The image type will be <see cref="ImageType.Bitmap"/>.
@@ -334,9 +294,8 @@ namespace TeximpNet
         /// <param name="redMask">Red part of the color layout, e.g. 0xFF0000.</param>
         /// <param name="greenMask">Green part of the color layout, e.g. 0x00FF00. </param>
         /// <param name="blueMask">Blue part of the color layout, e.g. 0x0000FF.</param>
-        public Surface(int bpp, int width, int height, uint redMask, uint greenMask, uint blueMask)
-        {
-            m_imagePtr = FreeImageLibrary.Instance.Allocate(width, height, bpp, redMask, greenMask, blueMask);
+        public Surface( int bpp, int width, int height, uint redMask, uint greenMask, uint blueMask ) {
+            m_imagePtr = FreeImageLibrary.Instance.Allocate( width, height, bpp, redMask, greenMask, blueMask );
 
             AddGCMemoryPressure();
         }
@@ -348,7 +307,7 @@ namespace TeximpNet
         /// <param name="bpp">Bit depth. Supported depth: 1-,4-,8-,16-,24-,32-bits per pixel.</param>
         /// <param name="width">Width of the image.</param>
         /// <param name="height">Height of the image.</param>
-        public Surface(ImageType imageType, int bpp, int width, int height) : this(imageType, bpp, width, height, 0, 0, 0) { }
+        public Surface( ImageType imageType, int bpp, int width, int height ) : this( imageType, bpp, width, height, 0, 0, 0 ) { }
 
         /// <summary>
         /// Constructs a new instance of the <see cref="Surface"/> class.
@@ -360,9 +319,8 @@ namespace TeximpNet
         /// <param name="redMask">Red part of the color layout, e.g. 0xFF0000.</param>
         /// <param name="greenMask">Green part of the color layout, e.g. 0x00FF00. </param>
         /// <param name="blueMask">Blue part of the color layout, e.g. 0x0000FF.</param>
-        public Surface(ImageType imageType, int bpp, int width, int height, uint redMask, uint greenMask, uint blueMask)
-        {
-            m_imagePtr = FreeImageLibrary.Instance.AllocateT(imageType, width, height, bpp, redMask, greenMask, blueMask);
+        public Surface( ImageType imageType, int bpp, int width, int height, uint redMask, uint greenMask, uint blueMask ) {
+            m_imagePtr = FreeImageLibrary.Instance.AllocateT( imageType, width, height, bpp, redMask, greenMask, blueMask );
 
             AddGCMemoryPressure();
         }
@@ -371,8 +329,7 @@ namespace TeximpNet
         /// Constructs a new instance of the <see cref="Surface"/> class.
         /// </summary>
         /// <param name="imagePtr">FreeImage bitmap pointer.</param>
-        public Surface(IntPtr imagePtr)
-        {
+        public Surface( IntPtr imagePtr ) {
             m_imagePtr = imagePtr;
 
             AddGCMemoryPressure();
@@ -381,9 +338,8 @@ namespace TeximpNet
         /// <summary>
         /// Finalizes an instance of the <see cref="Surface"/> class.
         /// </summary>
-        ~Surface()
-        {
-            Dispose(false);
+        ~Surface() {
+            Dispose( false );
         }
 
         /// <summary>
@@ -392,13 +348,12 @@ namespace TeximpNet
         /// <param name="filename">Name of file to load.</param>
         /// <param name="flags">Optional flags, by default this is <see cref="ImageLoadFlags.Default"/>.</param>
         /// <returns>Loaded surface, or null if there was an error in loading.</returns>
-        public static Surface LoadFromFile(String filename, ImageLoadFlags flags = ImageLoadFlags.Default)
-        {
-            IntPtr imagePtr = FreeImageLibrary.Instance.LoadFromFile(filename, flags);
-            if (imagePtr == IntPtr.Zero)
+        public static Surface LoadFromFile( string filename, ImageLoadFlags flags = ImageLoadFlags.Default ) {
+            var imagePtr = FreeImageLibrary.Instance.LoadFromFile( filename, flags );
+            if( imagePtr == IntPtr.Zero )
                 return null;
 
-            return new Surface(imagePtr);
+            return new Surface( imagePtr );
         }
 
         /// <summary>
@@ -409,10 +364,9 @@ namespace TeximpNet
         /// to be upper-left.</param>
         /// <param name="flags">Optional flags, by default this is <see cref="ImageLoadFlags.Default"/>.</param>
         /// <returns>Loaded surface, or null if there was an error in loading.</returns>
-        public static Surface LoadFromFile(String filename, bool flipImage, ImageLoadFlags flags = ImageLoadFlags.Default)
-        {
-            Surface surface = LoadFromFile(filename, flags);
-            if (surface != null && flipImage)
+        public static Surface LoadFromFile( string filename, bool flipImage, ImageLoadFlags flags = ImageLoadFlags.Default ) {
+            var surface = LoadFromFile( filename, flags );
+            if( surface != null && flipImage )
                 surface.FlipVertically();
 
             return surface;
@@ -424,13 +378,12 @@ namespace TeximpNet
         /// <param name="stream">Stream to load data from.</param>
         /// <param name="flags">Optional flags, by default this is <see cref="ImageLoadFlags.Default"/>.</param>
         /// <returns>Loaded surface, or null if there was an error in loading.</returns>
-        public static Surface LoadFromStream(Stream stream, ImageLoadFlags flags = ImageLoadFlags.Default)
-        {
-            IntPtr imagePtr = FreeImageLibrary.Instance.LoadFromStream(stream, flags);
-            if (imagePtr == IntPtr.Zero)
+        public static Surface LoadFromStream( Stream stream, ImageLoadFlags flags = ImageLoadFlags.Default ) {
+            var imagePtr = FreeImageLibrary.Instance.LoadFromStream( stream, flags );
+            if( imagePtr == IntPtr.Zero )
                 return null;
 
-            return new Surface(imagePtr);
+            return new Surface( imagePtr );
         }
 
         /// <summary>
@@ -441,10 +394,9 @@ namespace TeximpNet
         /// to be upper-left.</param>
         /// <param name="flags">Optional flags, by default this is <see cref="ImageLoadFlags.Default"/>.</param>
         /// <returns>Loaded surface, or null if there was an error in loading.</returns>
-        public static Surface LoadFromStream(Stream stream, bool flipImage, ImageLoadFlags flags = ImageLoadFlags.Default)
-        {
-            Surface surface = LoadFromStream(stream, flags);
-            if (surface != null && flipImage)
+        public static Surface LoadFromStream( Stream stream, bool flipImage, ImageLoadFlags flags = ImageLoadFlags.Default ) {
+            var surface = LoadFromStream( stream, flags );
+            if( surface != null && flipImage )
                 surface.FlipVertically();
 
             return surface;
@@ -460,40 +412,36 @@ namespace TeximpNet
         /// <param name="isBGRA">True if the data is BGRA, false if RGBA ordering. The input image may have to be converted to the default color ordering of the FreeImage surface (usually BGRA).</param>
         /// <param name="isTopDown">True if the image origin is considered to be upper left, false if lower left. FreeImage images are lower left origin, so if true this will cause the image data to be flipped vertically.</param>
         /// <returns>Surface containing the image, or null of there was an error in loading.</returns>
-        public static Surface LoadFromRawData(IntPtr imageDataPtr, int width, int height, int rowPitch, bool isBGRA, bool isTopDown = false)
-        {
-            ColorOrder colorOrder = Surface.ColorOrder;
-            int formatSizeBytes = 4; //32 bpp pixels;
+        public static Surface LoadFromRawData( IntPtr imageDataPtr, int width, int height, int rowPitch, bool isBGRA, bool isTopDown = false ) {
+            var colorOrder = Surface.ColorOrder;
+            var formatSizeBytes = 4; //32 bpp pixels;
             uint formatSizeBits = 32;
 
-            IntPtr data = imageDataPtr;
-            bool disposeData = false;
+            var data = imageDataPtr;
+            var disposeData = false;
 
-            try
-            {
+            try {
                 //Convert if color order does not match incoming color order
-                if (colorOrder.IsBGRAOrder != isBGRA)
-                {
+                if( colorOrder.IsBGRAOrder != isBGRA ) {
                     disposeData = true;
-                    data = MemoryHelper.AllocateMemory(width * height * formatSizeBytes);
-                    ImageHelper.CopyColorImageData(data, imageDataPtr, rowPitch, 0, width, height, 1, true);
+                    data = MemoryHelper.AllocateMemory( width * height * formatSizeBytes );
+                    ImageHelper.CopyColorImageData( data, imageDataPtr, rowPitch, 0, width, height, 1, true );
 
                     //Compute new row pitch
                     rowPitch = width * formatSizeBytes;
                 }
 
-                IntPtr surfacePtr = FreeImageLibrary.Instance.ConvertFromRawBitsEx(true, data, ImageType.Bitmap, width, height, rowPitch, formatSizeBits, colorOrder.RedMask, colorOrder.GreenIndex, colorOrder.BlueMask, isTopDown);
-                if (surfacePtr == IntPtr.Zero)
+                var surfacePtr = FreeImageLibrary.Instance.ConvertFromRawBitsEx( true, data, ImageType.Bitmap, width, height, rowPitch, formatSizeBits, colorOrder.RedMask, colorOrder.GreenIndex, colorOrder.BlueMask, isTopDown );
+                if( surfacePtr == IntPtr.Zero )
                     return null;
 
-                return new Surface(surfacePtr);
+                return new Surface( surfacePtr );
             }
-            finally
-            {
+            finally {
                 //Free temp memory, if we allocated it
-                if (disposeData)
-                    MemoryHelper.FreeMemory(data);
-            }           
+                if( disposeData )
+                    MemoryHelper.FreeMemory( data );
+            }
         }
 
         /// <summary>
@@ -503,12 +451,11 @@ namespace TeximpNet
         /// <param name="fileName">Name of file to create.</param>
         /// <param name="flags">Optional save flags, by default this is <see cref="ImageSaveFlags.Default"/>.</param>
         /// <returns>True if the operation is successful, false if otherwise.</returns>
-        public bool SaveToFile(ImageFormat format, String fileName, ImageSaveFlags flags = ImageSaveFlags.Default)
-        {
-            if (String.IsNullOrEmpty(fileName) || m_imagePtr == IntPtr.Zero || format == ImageFormat.Unknown)
+        public bool SaveToFile( ImageFormat format, string fileName, ImageSaveFlags flags = ImageSaveFlags.Default ) {
+            if( string.IsNullOrEmpty( fileName ) || m_imagePtr == IntPtr.Zero || format == ImageFormat.Unknown )
                 return false;
 
-            return FreeImageLibrary.Instance.SaveToFile(format, m_imagePtr, fileName, flags);
+            return FreeImageLibrary.Instance.SaveToFile( format, m_imagePtr, fileName, flags );
         }
 
         /// <summary>
@@ -518,12 +465,11 @@ namespace TeximpNet
         /// <param name="stream">Stream to output image to.</param>
         /// <param name="flags">Optional save flags, by default this is <see cref="ImageSaveFlags.Default"/>.</param>
         /// <returns>True if the operation is successful, false if otherwise.</returns>
-        public bool SaveToStream(ImageFormat format, Stream stream, ImageSaveFlags flags = ImageSaveFlags.Default)
-        {
-            if (stream == null || !stream.CanWrite || m_imagePtr == IntPtr.Zero || format == ImageFormat.Unknown)
+        public bool SaveToStream( ImageFormat format, Stream stream, ImageSaveFlags flags = ImageSaveFlags.Default ) {
+            if( stream == null || !stream.CanWrite || m_imagePtr == IntPtr.Zero || format == ImageFormat.Unknown )
                 return false;
 
-            return FreeImageLibrary.Instance.SaveToStream(format, m_imagePtr, stream, flags);
+            return FreeImageLibrary.Instance.SaveToStream( format, m_imagePtr, stream, flags );
         }
 
         /// <summary>
@@ -531,29 +477,27 @@ namespace TeximpNet
         /// </summary>
         /// <param name="scanLine">Scanline to obtain a pointer to. The number of scanlines in an image is Height-1.</param>
         /// <returns>Pointer to scanline.</returns>
-        public IntPtr GetScanLine(int scanLine)
-        {
-            if (m_imagePtr == IntPtr.Zero)
+        public IntPtr GetScanLine( int scanLine ) {
+            if( m_imagePtr == IntPtr.Zero )
                 return IntPtr.Zero;
 
-            int height = Height;
-            if (scanLine < 0 || scanLine >= height)
+            var height = Height;
+            if( scanLine < 0 || scanLine >= height )
                 return IntPtr.Zero;
 
-            return FreeImageLibrary.Instance.GetScanLine(m_imagePtr, scanLine);
+            return FreeImageLibrary.Instance.GetScanLine( m_imagePtr, scanLine );
         }
 
         /// <summary>
         /// Clones the surface into a new instance. If the surface is disposed then this returns null.
         /// </summary>
         /// <returns>Cloned surface.</returns>
-        public Surface Clone()
-        {
-            if(m_imagePtr == IntPtr.Zero)
+        public Surface Clone() {
+            if( m_imagePtr == IntPtr.Zero )
                 return null;
 
-            IntPtr imagePtr = FreeImageLibrary.Instance.Clone(m_imagePtr);
-            return new Surface(imagePtr);
+            var imagePtr = FreeImageLibrary.Instance.Clone( m_imagePtr );
+            return new Surface( imagePtr );
         }
 
         /// <summary>
@@ -565,16 +509,15 @@ namespace TeximpNet
         /// <param name="right">Rightmost texel position of the rectangle.</param>
         /// <param name="bottom">Bottommost texel position of the rectangle.</param>
         /// <returns>Subimage surface.</returns>
-        public Surface Clone(int left, int top, int right, int bottom)
-        {
-            if (m_imagePtr == IntPtr.Zero)
+        public Surface Clone( int left, int top, int right, int bottom ) {
+            if( m_imagePtr == IntPtr.Zero )
                 return null;
 
-            IntPtr subimagePtr = FreeImageLibrary.Instance.Copy(m_imagePtr, left, top, right, bottom);
-            if (subimagePtr == IntPtr.Zero)
+            var subimagePtr = FreeImageLibrary.Instance.Copy( m_imagePtr, left, top, right, bottom );
+            if( subimagePtr == IntPtr.Zero )
                 return null;
 
-            return new Surface(subimagePtr);
+            return new Surface( subimagePtr );
         }
 
         /// <summary>
@@ -585,12 +528,11 @@ namespace TeximpNet
         /// <param name="top">Topmost texel in this bitmap to start copying data to.</param>
         /// <param name="alphaBlend">0-255 alphablend value, if >= 255 then the src image data overwrites completely.</param>
         /// <returns>True if the operation was successful, false otherwise.</returns>
-        public bool CopyFrom(Surface src, int left, int top, int alphaBlend = 255)
-        {
-            if (m_imagePtr == IntPtr.Zero || src == null || src.m_imagePtr == IntPtr.Zero)
+        public bool CopyFrom( Surface src, int left, int top, int alphaBlend = 255 ) {
+            if( m_imagePtr == IntPtr.Zero || src == null || src.m_imagePtr == IntPtr.Zero )
                 return false;
 
-            return FreeImageLibrary.Instance.Paste(m_imagePtr, src.m_imagePtr, left, top, alphaBlend);
+            return FreeImageLibrary.Instance.Paste( m_imagePtr, src.m_imagePtr, left, top, alphaBlend );
         }
 
         /// <summary>
@@ -599,59 +541,56 @@ namespace TeximpNet
         /// </summary>
         /// <param name="convertTo">Format to convert to.</param>
         /// <returns>True if the operation was successful, false otherwise. If conversion fails, the current data is not disposed.</returns>
-        public bool ConvertTo(ImageConversion convertTo)
-        {
-            IntPtr newImagePtr = IntPtr.Zero;
-
-            switch(convertTo)
-            {
+        public bool ConvertTo( ImageConversion convertTo ) {
+            IntPtr newImagePtr;
+            switch( convertTo ) {
                 case ImageConversion.To4Bits:
-                    newImagePtr = FreeImageLibrary.Instance.ConvertTo4Bits(m_imagePtr);
+                    newImagePtr = FreeImageLibrary.Instance.ConvertTo4Bits( m_imagePtr );
                     break;
                 case ImageConversion.To8Bits:
-                    newImagePtr = FreeImageLibrary.Instance.ConvertTo8Bits(m_imagePtr);
+                    newImagePtr = FreeImageLibrary.Instance.ConvertTo8Bits( m_imagePtr );
                     break;
                 case ImageConversion.To16Bits555:
-                    newImagePtr = FreeImageLibrary.Instance.ConvertTo16Bits555(m_imagePtr);
+                    newImagePtr = FreeImageLibrary.Instance.ConvertTo16Bits555( m_imagePtr );
                     break;
                 case ImageConversion.To16Bits565:
-                    newImagePtr = FreeImageLibrary.Instance.ConvertTo16Bits565(m_imagePtr);
+                    newImagePtr = FreeImageLibrary.Instance.ConvertTo16Bits565( m_imagePtr );
                     break;
                 case ImageConversion.To24Bits:
-                    newImagePtr = FreeImageLibrary.Instance.ConvertTo24Bits(m_imagePtr);
+                    newImagePtr = FreeImageLibrary.Instance.ConvertTo24Bits( m_imagePtr );
                     break;
                 case ImageConversion.To32Bits:
-                    newImagePtr = FreeImageLibrary.Instance.ConvertTo32Bits(m_imagePtr);
+                    newImagePtr = FreeImageLibrary.Instance.ConvertTo32Bits( m_imagePtr );
                     break;
                 case ImageConversion.ToGreyscale:
-                    newImagePtr = FreeImageLibrary.Instance.ConvertToGreyscale(m_imagePtr);
+                    newImagePtr = FreeImageLibrary.Instance.ConvertToGreyscale( m_imagePtr );
                     break;
                 case ImageConversion.ToFloat:
-                    newImagePtr = FreeImageLibrary.Instance.ConvertToFloat(m_imagePtr);
+                    newImagePtr = FreeImageLibrary.Instance.ConvertToFloat( m_imagePtr );
                     break;
                 case ImageConversion.ToUInt16:
-                    newImagePtr = FreeImageLibrary.Instance.ConvertToUINT16(m_imagePtr);
+                    newImagePtr = FreeImageLibrary.Instance.ConvertToUINT16( m_imagePtr );
                     break;
                 case ImageConversion.ToRGBF:
-                    newImagePtr = FreeImageLibrary.Instance.ConvertToRGBF(m_imagePtr);
+                    newImagePtr = FreeImageLibrary.Instance.ConvertToRGBF( m_imagePtr );
                     break;
                 case ImageConversion.ToRGBAF:
-                    newImagePtr = FreeImageLibrary.Instance.ConvertToRGBAF(m_imagePtr);
+                    newImagePtr = FreeImageLibrary.Instance.ConvertToRGBAF( m_imagePtr );
                     break;
                 case ImageConversion.ToRGB16:
-                    newImagePtr = FreeImageLibrary.Instance.ConvertToRGB16(m_imagePtr);
+                    newImagePtr = FreeImageLibrary.Instance.ConvertToRGB16( m_imagePtr );
                     break;
                 case ImageConversion.ToRGBA16:
-                    newImagePtr = FreeImageLibrary.Instance.ConvertToRGBA16(m_imagePtr);
+                    newImagePtr = FreeImageLibrary.Instance.ConvertToRGBA16( m_imagePtr );
                     break;
                 default:
                     return false;
             }
 
-            if(newImagePtr == IntPtr.Zero)
+            if( newImagePtr == IntPtr.Zero )
                 return false;
 
-            FreeImageLibrary.Instance.Unload(m_imagePtr);
+            FreeImageLibrary.Instance.Unload( m_imagePtr );
             m_imagePtr = newImagePtr;
 
             return true;
@@ -661,24 +600,22 @@ namespace TeximpNet
         /// Flips the image contents horizontally along the vertical axis, in place.
         /// </summary>
         /// <returns>True if the operation was successful, false otherwise.</returns>
-        public bool FlipHorizontally()
-        {
-            if (m_imagePtr == IntPtr.Zero)
+        public bool FlipHorizontally() {
+            if( m_imagePtr == IntPtr.Zero )
                 return false;
 
-            return FreeImageLibrary.Instance.FlipHorizontal(m_imagePtr);
+            return FreeImageLibrary.Instance.FlipHorizontal( m_imagePtr );
         }
 
         /// <summary>
         /// Flips the image contents vertically along the horizontal axis, in place.
         /// </summary>
         /// <returns>True if the operation was successful, false otherwise.</returns>
-        public bool FlipVertically()
-        {
-            if (m_imagePtr == IntPtr.Zero)
+        public bool FlipVertically() {
+            if( m_imagePtr == IntPtr.Zero )
                 return false;
 
-            return FreeImageLibrary.Instance.FlipVertical(m_imagePtr);
+            return FreeImageLibrary.Instance.FlipVertical( m_imagePtr );
         }
 
         /// <summary>
@@ -687,17 +624,16 @@ namespace TeximpNet
         /// </summary>
         /// <param name="angle">Angle to rotate, in degrees.</param>
         /// <returns>True if the operation was successful, false otherwise.</returns>
-        public bool Rotate(double angle)
-        {
-            if (m_imagePtr == IntPtr.Zero)
+        public bool Rotate( double angle ) {
+            if( m_imagePtr == IntPtr.Zero )
                 return false;
 
-            IntPtr newImagePtr = FreeImageLibrary.Instance.Rotate(m_imagePtr, angle);
+            var newImagePtr = FreeImageLibrary.Instance.Rotate( m_imagePtr, angle );
 
-            if (newImagePtr == IntPtr.Zero)
+            if( newImagePtr == IntPtr.Zero )
                 return false;
 
-            FreeImageLibrary.Instance.Unload(m_imagePtr);
+            FreeImageLibrary.Instance.Unload( m_imagePtr );
             m_imagePtr = newImagePtr;
 
             return true;
@@ -707,12 +643,11 @@ namespace TeximpNet
         /// Applies the alpha value of each pixel to its color components. The alpha value stays unchanged. Only works with 32-bits color depth.
         /// </summary>
         /// <returns>True if the operation was successful, false otherwise.</returns>
-        public bool PreMultiplyAlpha()
-        {
-            if (m_imagePtr == IntPtr.Zero)
+        public bool PreMultiplyAlpha() {
+            if( m_imagePtr == IntPtr.Zero )
                 return false;
 
-            return FreeImageLibrary.Instance.PreMultiplyWithAlpha(m_imagePtr);
+            return FreeImageLibrary.Instance.PreMultiplyWithAlpha( m_imagePtr );
         }
 
         /// <summary>
@@ -720,12 +655,11 @@ namespace TeximpNet
         /// </summary>
         /// <param name="gamma">Gamma value (greater than zero). A value of 1.0 leaves the image, less darkens, and greater than one lightens.</param>
         /// <returns>True if the operation was successful, false otherwise.</returns>
-        public bool AdjustGamma(double gamma)
-        {
-            if (m_imagePtr == IntPtr.Zero)
+        public bool AdjustGamma( double gamma ) {
+            if( m_imagePtr == IntPtr.Zero )
                 return false;
 
-            return FreeImageLibrary.Instance.AdjustGamma(m_imagePtr, gamma);
+            return FreeImageLibrary.Instance.AdjustGamma( m_imagePtr, gamma );
         }
 
         /// <summary>
@@ -733,12 +667,11 @@ namespace TeximpNet
         /// </summary>
         /// <param name="percentage">A value of zero means no change, less than zero will make the image darker, and greater than zero will make the image brighter.</param>
         /// <returns>True if the operation was successful, false otherwise.</returns>
-        public bool AdjustBrightness(double percentage)
-        {
-            if (m_imagePtr == IntPtr.Zero)
+        public bool AdjustBrightness( double percentage ) {
+            if( m_imagePtr == IntPtr.Zero )
                 return false;
 
-            return FreeImageLibrary.Instance.AdjustBrightness(m_imagePtr, percentage);
+            return FreeImageLibrary.Instance.AdjustBrightness( m_imagePtr, percentage );
         }
 
         /// <summary>
@@ -746,24 +679,22 @@ namespace TeximpNet
         /// </summary>
         /// <param name="percentage">A value of zero means no change, less than zero will decrease the contrast, and greater than zero will increase the contrast.</param>
         /// <returns>True if the operation was successful, false otherwise.</returns>
-        public bool AdjustContrast(double percentage)
-        {
-            if (m_imagePtr == IntPtr.Zero)
+        public bool AdjustContrast( double percentage ) {
+            if( m_imagePtr == IntPtr.Zero )
                 return false;
 
-            return FreeImageLibrary.Instance.AdjustContrast(m_imagePtr, percentage);
+            return FreeImageLibrary.Instance.AdjustContrast( m_imagePtr, percentage );
         }
 
         /// <summary>
         /// Inverts each pixel data.
         /// </summary>
         /// <returns>True if the operation was successful, false otherwise.</returns>
-        public bool Invert()
-        {
-            if (m_imagePtr == IntPtr.Zero)
+        public bool Invert() {
+            if( m_imagePtr == IntPtr.Zero )
                 return false;
 
-            return FreeImageLibrary.Instance.Invert(m_imagePtr);
+            return FreeImageLibrary.Instance.Invert( m_imagePtr );
         }
 
         /// <summary>
@@ -774,17 +705,16 @@ namespace TeximpNet
         /// <param name="height">Destination height.</param>
         /// <param name="filter">Filter algorithm used for sampling.</param>
         /// <returns>True if the operation was successful, false otherwise.</returns>
-        public bool Resize(int width, int height, ImageFilter filter)
-        {
-            if (m_imagePtr == IntPtr.Zero)
+        public bool Resize( int width, int height, ImageFilter filter ) {
+            if( m_imagePtr == IntPtr.Zero )
                 return false;
 
-            IntPtr newImagePtr = FreeImageLibrary.Instance.Rescale(m_imagePtr, width, height, filter);
+            var newImagePtr = FreeImageLibrary.Instance.Rescale( m_imagePtr, width, height, filter );
 
-            if (newImagePtr == IntPtr.Zero)
+            if( newImagePtr == IntPtr.Zero )
                 return false;
 
-            FreeImageLibrary.Instance.Unload(m_imagePtr);
+            FreeImageLibrary.Instance.Unload( m_imagePtr );
             m_imagePtr = newImagePtr;
 
             return true;
@@ -797,12 +727,11 @@ namespace TeximpNet
         /// <param name="colorToReplaceWith">Color value to replace with.</param>
         /// <param name="ignoreAlpha">True if alpha should be ignored or not, meaning if colors in a 32-bit image should be treated as 24-bit.</param>
         /// <returns>True if the operation was successful, false otherwise.</returns>
-        public bool SwapColors(RGBAQuad colorToReplace, RGBAQuad colorToReplaceWith, bool ignoreAlpha)
-        {
-            if (m_imagePtr == IntPtr.Zero)
+        public bool SwapColors( RGBAQuad colorToReplace, RGBAQuad colorToReplaceWith, bool ignoreAlpha ) {
+            if( m_imagePtr == IntPtr.Zero )
                 return false;
 
-            return FreeImageLibrary.Instance.SwapColors(m_imagePtr, colorToReplace, colorToReplaceWith, ignoreAlpha) > 0;
+            return FreeImageLibrary.Instance.SwapColors( m_imagePtr, colorToReplace, colorToReplaceWith, ignoreAlpha ) > 0;
         }
 
         /// <summary>
@@ -813,31 +742,29 @@ namespace TeximpNet
         /// <param name="includeFirst">Optionally include the first mip in the list, by default this is true.</param>
         /// <param name="maxLevel">Max mip level to generate, a value that is less than or equal to zero will result in the full mipchain.</param>
         /// <returns>True if the operation was successful, false otherwise.</returns>
-        public bool GenerateMipMaps(IList<Surface> mipChain, ImageFilter filter,  bool includeFirst = true, int maxLevel = -1)
-        {
-            if (mipChain == null || m_imagePtr == IntPtr.Zero)
+        public bool GenerateMipMaps( IList<Surface> mipChain, ImageFilter filter, bool includeFirst = true, int maxLevel = -1 ) {
+            if( mipChain == null || m_imagePtr == IntPtr.Zero )
                 return false;
 
-            if (includeFirst)
-                mipChain.Add(this);
+            if( includeFirst )
+                mipChain.Add( this );
 
-            int width = Width;
-            int height = Height;
-            int mipCount = ImageHelper.CountMipmaps(width, height, 1);
+            var width = Width;
+            var height = Height;
+            var mipCount = ImageHelper.CountMipmaps( width, height, 1 );
 
             //If max level explicitly set, get the minimum since we can't go beyond the # of mips based on width/height
-            if (maxLevel > 0)
-                mipCount = Math.Min(mipCount, maxLevel);
+            if( maxLevel > 0 )
+                mipCount = Math.Min( mipCount, maxLevel );
 
-            for(int i = 1; i < mipCount; i++)
-            {
-                int mipWidth = width;
-                int mipHeight = height;
-                ImageHelper.CalculateMipmapLevelDimensions(i, ref mipWidth, ref mipHeight);
+            for( var i = 1; i < mipCount; i++ ) {
+                var mipWidth = width;
+                var mipHeight = height;
+                ImageHelper.CalculateMipmapLevelDimensions( i, ref mipWidth, ref mipHeight );
 
-                IntPtr mipPtr = FreeImageLibrary.Instance.Rescale(m_imagePtr, mipWidth, mipHeight, filter);
-                if(mipPtr != IntPtr.Zero)
-                    mipChain.Add(new Surface(mipPtr));
+                var mipPtr = FreeImageLibrary.Instance.Rescale( m_imagePtr, mipWidth, mipHeight, filter );
+                if( mipPtr != IntPtr.Zero )
+                    mipChain.Add( new Surface( mipPtr ) );
             }
 
             return true;
@@ -846,22 +773,18 @@ namespace TeximpNet
         /// <summary>
         /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
         /// </summary>
-        public void Dispose()
-        {
-            Dispose(true);
+        public void Dispose() {
+            Dispose( true );
 
-            GC.SuppressFinalize(this);
+            GC.SuppressFinalize( this );
         }
 
-        private void Dispose(bool isDisposing)
-        {
-            if(!m_isDisposed)
-            {
-                if(m_imagePtr != IntPtr.Zero)
-                {
+        private void Dispose( bool isDisposing ) {
+            if( !m_isDisposed ) {
+                if( m_imagePtr != IntPtr.Zero ) {
                     RemoveGCMemoryPressure();
 
-                    FreeImageLibrary.Instance.Unload(m_imagePtr);
+                    FreeImageLibrary.Instance.Unload( m_imagePtr );
                     m_imagePtr = IntPtr.Zero;
                 }
 
@@ -869,16 +792,14 @@ namespace TeximpNet
             }
         }
 
-        private void AddGCMemoryPressure()
-        {
-            int estimatedSize = Pitch * Height;
-            GC.AddMemoryPressure(estimatedSize);
+        private void AddGCMemoryPressure() {
+            var estimatedSize = Pitch * Height;
+            GC.AddMemoryPressure( estimatedSize );
         }
 
-        private void RemoveGCMemoryPressure()
-        {
-            int estimatedSize = Pitch * Height;
-            GC.RemoveMemoryPressure(estimatedSize);
+        private void RemoveGCMemoryPressure() {
+            var estimatedSize = Pitch * Height;
+            GC.RemoveMemoryPressure( estimatedSize );
         }
     }
 }

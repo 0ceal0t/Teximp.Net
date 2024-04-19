@@ -24,14 +24,12 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
-namespace TeximpNet.DDS
-{
+namespace TeximpNet.DDS {
     /// <summary>
     /// Represents a collection of mipmap surfaces. A valid texture always has at least one surface. The first surface is the largest image, and each subsequent mipmap
     /// is a scaled down texture by a factor of 2.
     /// </summary>
-    public sealed class MipChain : List<MipData>
-    {
+    public sealed class MipChain : List<MipData> {
         /// <summary>
         /// Constructs a new <see cref="MipChain"/>.
         /// </summary>
@@ -41,22 +39,21 @@ namespace TeximpNet.DDS
         /// Constructs a new <see cref="MipChain"/>.
         /// </summary>
         /// <param name="capacity">Initial capacity.</param>
-        public MipChain(int capacity) : base(capacity) { }
+        public MipChain( int capacity ) : base( capacity ) { }
 
         /// <summary>
         /// Constructs a new <see cref="MipChain"/>.
         /// </summary>
         /// <param name="surfaces">Collection of images to add to this collection.</param>
-        public MipChain(IEnumerable<MipData> surfaces) : base(surfaces) { }
+        public MipChain( IEnumerable<MipData> surfaces ) : base( surfaces ) { }
     }
 
     /// <summary>
     /// Represents mipmap data for a single image in a mipchain. The image data may be a 1D, 2D, or 3D image.
     /// </summary>
-    /// <seealso cref="System.IDisposable" />
-    [DebuggerDisplay("Width = {Width}, Height = {Height}, Depth = {Depth}, RowPitch = {RowPitch}, SlicePitch = {SlicePitch}, SizeInBytes = {SizeInBytes}, OwnsData = {OwnsData}")]
-    public sealed class MipData : IDisposable
-    {
+    /// <seealso cref="IDisposable" />
+    [DebuggerDisplay( "Width = {Width}, Height = {Height}, Depth = {Depth}, RowPitch = {RowPitch}, SlicePitch = {SlicePitch}, SizeInBytes = {SizeInBytes}, OwnsData = {OwnsData}" )]
+    public sealed class MipData : IDisposable {
         private bool m_isDisposed;
         private bool m_ownData;
 
@@ -93,10 +90,8 @@ namespace TeximpNet.DDS
         /// <summary>
         /// Gets the total size of the image data in bytes.
         /// </summary>
-        public int SizeInBytes
-        {
-            get
-            {
+        public int SizeInBytes {
+            get {
                 return Depth * SlicePitch;
             }
         }
@@ -104,10 +99,8 @@ namespace TeximpNet.DDS
         /// <summary>
         /// Gets if this object owns the image memory.
         /// </summary>
-        public bool OwnsData
-        {
-            get
-            {
+        public bool OwnsData {
+            get {
                 return m_ownData;
             }
         }
@@ -119,8 +112,7 @@ namespace TeximpNet.DDS
         /// <param name="rowPitch">Row pitch.</param>
         /// <param name="data">Pointer to image data.</param>
         /// <param name="ownData">If true, the pointer will be cleaned up by this object, if false then it is assumed to be managed externally.</param>
-        public MipData(int width, int rowPitch, IntPtr data, bool ownData = true)
-        {
+        public MipData( int width, int rowPitch, IntPtr data, bool ownData = true ) {
             m_isDisposed = false;
 
             Width = width;
@@ -133,7 +125,7 @@ namespace TeximpNet.DDS
             m_ownData = ownData;
             Data = data;
 
-            if(ownData)
+            if( ownData )
                 AddGCMemoryPressure();
         }
 
@@ -142,8 +134,7 @@ namespace TeximpNet.DDS
         /// </summary>
         /// <param name="width">Width of the image, in texels.</param>
         /// <param name="rowPitch">Row pitch.</param>
-        public MipData(int width, int rowPitch)
-        {
+        public MipData( int width, int rowPitch ) {
             m_isDisposed = false;
 
             Width = width;
@@ -154,7 +145,7 @@ namespace TeximpNet.DDS
             SlicePitch = rowPitch;
 
             m_ownData = true;
-            Data = MemoryHelper.AllocateMemory(SizeInBytes);
+            Data = MemoryHelper.AllocateMemory( SizeInBytes );
             AddGCMemoryPressure();
         }
 
@@ -166,8 +157,7 @@ namespace TeximpNet.DDS
         /// <param name="rowPitch">Row pitch.</param>
         /// <param name="data">Pointer to image data.</param>
         /// <param name="ownData">If true, the pointer will be cleaned up by this object, if false then it is assumed to be managed externally.</param>
-        public MipData(int width, int height, int rowPitch, IntPtr data, bool ownData = true)
-        {
+        public MipData( int width, int height, int rowPitch, IntPtr data, bool ownData = true ) {
             m_isDisposed = false;
 
             Width = width;
@@ -180,7 +170,7 @@ namespace TeximpNet.DDS
             m_ownData = ownData;
             Data = data;
 
-            if(ownData)
+            if( ownData )
                 AddGCMemoryPressure();
         }
 
@@ -190,8 +180,7 @@ namespace TeximpNet.DDS
         /// <param name="width">Width of the image, in texels.</param>
         /// <param name="height">Height of the image, in texels.</param>
         /// <param name="rowPitch">Row pitch.</param>
-        public MipData(int width, int height, int rowPitch)
-        {
+        public MipData( int width, int height, int rowPitch ) {
             m_isDisposed = false;
 
             Width = width;
@@ -202,7 +191,7 @@ namespace TeximpNet.DDS
             SlicePitch = rowPitch * height;
 
             m_ownData = true;
-            Data = MemoryHelper.AllocateMemory(SizeInBytes);
+            Data = MemoryHelper.AllocateMemory( SizeInBytes );
             AddGCMemoryPressure();
         }
 
@@ -216,8 +205,7 @@ namespace TeximpNet.DDS
         /// <param name="slicePitch">Slice pitch.</param>
         /// <param name="data">Pointer to image data.</param>
         /// <param name="ownData">If true, the pointer will be cleaned up by this object, if false then it is assumed to be managed externally.</param>
-        public MipData(int width, int height, int depth, int rowPitch, int slicePitch, IntPtr data, bool ownData = true)
-        {
+        public MipData( int width, int height, int depth, int rowPitch, int slicePitch, IntPtr data, bool ownData = true ) {
             m_isDisposed = false;
 
             Width = width;
@@ -230,7 +218,7 @@ namespace TeximpNet.DDS
             m_ownData = ownData;
             Data = data;
 
-            if(ownData)
+            if( ownData )
                 AddGCMemoryPressure();
         }
 
@@ -242,8 +230,7 @@ namespace TeximpNet.DDS
         /// <param name="depth">Depth of the image, in texels.</param>
         /// <param name="rowPitch">Row pitch.</param>
         /// <param name="slicePitch">Slice pitch.</param>
-        public MipData(int width, int height, int depth, int rowPitch, int slicePitch)
-        {
+        public MipData( int width, int height, int depth, int rowPitch, int slicePitch ) {
             m_isDisposed = false;
 
             Width = width;
@@ -254,7 +241,7 @@ namespace TeximpNet.DDS
             SlicePitch = slicePitch;
 
             m_ownData = true;
-            Data = MemoryHelper.AllocateMemory(SizeInBytes);
+            Data = MemoryHelper.AllocateMemory( SizeInBytes );
             AddGCMemoryPressure();
         }
 
@@ -264,10 +251,9 @@ namespace TeximpNet.DDS
         /// <param name="bitmap">FreeImage bitmap to wrap or copy from.</param>
         /// <param name="copyData">True to copy the image data, false to wrap the free image bitmap data.</param>
         /// <exception cref="ArgumentException">Thrown if the bitmap is not valid.</exception>
-        public MipData(Surface bitmap, bool copyData = false)
-        {
-            if(bitmap == null || bitmap.IsDisposed)
-                throw new ArgumentException("Surface is not valid.");
+        public MipData( Surface bitmap, bool copyData = false ) {
+            if( bitmap == null || bitmap.IsDisposed )
+                throw new ArgumentException( "Surface is not valid." );
 
             m_isDisposed = false;
 
@@ -278,19 +264,17 @@ namespace TeximpNet.DDS
             RowPitch = bitmap.Pitch;
             SlicePitch = RowPitch * Height;
 
-            if(!copyData)
-            {
+            if( !copyData ) {
                 m_ownData = false;
 
                 Data = bitmap.DataPtr;
             }
-            else
-            {
+            else {
                 m_ownData = true;
 
-                int sizeInBytes = SizeInBytes;
-                Data = MemoryHelper.AllocateMemory(sizeInBytes);
-                MemoryHelper.CopyMemory(Data, bitmap.DataPtr, sizeInBytes);
+                var sizeInBytes = SizeInBytes;
+                Data = MemoryHelper.AllocateMemory( sizeInBytes );
+                MemoryHelper.CopyMemory( Data, bitmap.DataPtr, sizeInBytes );
 
                 AddGCMemoryPressure();
             }
@@ -299,28 +283,23 @@ namespace TeximpNet.DDS
         /// <summary>
         /// Finalizes an instance of the <see cref="MipData"/> class.
         /// </summary>
-        ~MipData()
-        {
-            Dispose(false);
+        ~MipData() {
+            Dispose( false );
         }
 
         /// <summary>
         /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
         /// </summary>
-        public void Dispose()
-        {
-            Dispose(true);
+        public void Dispose() {
+            Dispose( true );
 
-            GC.SuppressFinalize(this);
+            GC.SuppressFinalize( this );
         }
 
-        private void Dispose(bool isDisposing)
-        {
-            if(!m_isDisposed)
-            {
-                if(m_ownData)
-                {
-                    MemoryHelper.FreeMemory(Data);
+        private void Dispose( bool isDisposing ) {
+            if( !m_isDisposed ) {
+                if( m_ownData ) {
+                    MemoryHelper.FreeMemory( Data );
                     RemoveGCMemoryPressure();
                 }
 
@@ -328,14 +307,12 @@ namespace TeximpNet.DDS
             }
         }
 
-        private void AddGCMemoryPressure()
-        {
-            GC.AddMemoryPressure(SizeInBytes);
+        private void AddGCMemoryPressure() {
+            GC.AddMemoryPressure( SizeInBytes );
         }
 
-        private void RemoveGCMemoryPressure()
-        {
-            GC.RemoveMemoryPressure(SizeInBytes);
+        private void RemoveGCMemoryPressure() {
+            GC.RemoveMemoryPressure( SizeInBytes );
         }
     }
 }

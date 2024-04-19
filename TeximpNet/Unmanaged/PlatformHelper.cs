@@ -26,26 +26,21 @@ using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
 
-namespace TeximpNet.Unmanaged
-{
+namespace TeximpNet.Unmanaged {
 #if !NETSTANDARD1_3
-    internal enum OSPlatform
-    {
+    internal enum OSPlatform {
         Windows = 0,
         Linux = 1,
         OSX = 2
     }
 
-    internal static class RuntimeInformation
-    {
+    internal static class RuntimeInformation {
         private static OSPlatform s_platform;
 
-        static RuntimeInformation()
-        {
-            switch (Environment.OSVersion.Platform)
-            {
+        static RuntimeInformation() {
+            switch( Environment.OSVersion.Platform ) {
                 case PlatformID.Unix:
-                    if (Directory.Exists("/Applications") && Directory.Exists("/System") && Directory.Exists("/Users") && Directory.Exists("/Volumes"))
+                    if( Directory.Exists( "/Applications" ) && Directory.Exists( "/System" ) && Directory.Exists( "/Users" ) && Directory.Exists( "/Volumes" ) )
                         s_platform = OSPlatform.OSX;
                     else
                         s_platform = OSPlatform.Linux;
@@ -59,33 +54,29 @@ namespace TeximpNet.Unmanaged
             }
         }
 
-        public static bool IsOSPlatform(OSPlatform osPlat)
-        {
+        public static bool IsOSPlatform( OSPlatform osPlat ) {
             return s_platform == osPlat;
         }
     }
 #endif
 
     //Helper class for making it easier to access certain reflection methods on types between .Net framework and .Net standard (pre-netstandard 2.0)
-    internal class PlatformHelper
-    {
-        public static String GetInformationalVersion()
-        {
+    internal class PlatformHelper {
+        public static string GetInformationalVersion() {
 #if NETSTANDARD1_3
-            AssemblyInformationalVersionAttribute attr = typeof(PlatformHelper).GetTypeInfo().Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>();
+            var attr = typeof(PlatformHelper).GetTypeInfo().Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>();
             return (attr != null) ? attr.InformationalVersion : null;
 #else
-            object[] attributes = Assembly.GetExecutingAssembly().GetCustomAttributes(typeof(AssemblyInformationalVersionAttribute), false);
-            if(attributes == null || attributes.Length == 0)
+            var attributes = Assembly.GetExecutingAssembly().GetCustomAttributes( typeof( AssemblyInformationalVersionAttribute ), false );
+            if( attributes == null || attributes.Length == 0 )
                 return null;
 
-            AssemblyInformationalVersionAttribute attr = attributes[0] as AssemblyInformationalVersionAttribute;
-            return (attr != null) ? attr.InformationalVersion : null;
+            var attr = attributes[0] as AssemblyInformationalVersionAttribute;
+            return ( attr != null ) ? attr.InformationalVersion : null;
 #endif
         }
 
-        public static String GetAssemblyName()
-        {
+        public static string GetAssemblyName() {
 #if NETSTANDARD1_3
             return typeof(PlatformHelper).GetTypeInfo().Assembly.GetName().Name;
 #else
@@ -93,8 +84,7 @@ namespace TeximpNet.Unmanaged
 #endif
         }
 
-        public static String GetAppBaseDirectory()
-        {
+        public static string GetAppBaseDirectory() {
 #if NETSTANDARD1_3
             return AppContext.BaseDirectory;
 #else
@@ -102,27 +92,25 @@ namespace TeximpNet.Unmanaged
 #endif
         }
 
-        public static bool IsAssignable(Type baseType, Type subType)
-        {
-            if (baseType == null || subType == null)
+        public static bool IsAssignable( Type baseType, Type subType ) {
+            if( baseType == null || subType == null )
                 return false;
 
 #if NETSTANDARD1_3
             return baseType.GetTypeInfo().IsAssignableFrom(subType.GetTypeInfo());
 #else
-            return baseType.IsAssignableFrom(subType);
+            return baseType.IsAssignableFrom( subType );
 #endif
         }
 
-        public static Type[] GetNestedTypes(Type type)
-        {
-            if (type == null)
+        public static Type[] GetNestedTypes( Type type ) {
+            if( type == null )
                 return new Type[0];
-            
+
 #if NETSTANDARD1_3
-            IEnumerable<TypeInfo> typeInfos = type.GetTypeInfo().DeclaredNestedTypes;
-            List<Type> types = new List<Type>();
-            foreach (TypeInfo typeInfo in typeInfos)
+            var typeInfos = type.GetTypeInfo().DeclaredNestedTypes;
+            List<Type> types = [];
+            foreach (var typeInfo in typeInfos)
                 types.Add(typeInfo.AsType());
 
             return types.ToArray();
@@ -131,19 +119,17 @@ namespace TeximpNet.Unmanaged
 #endif
         }
 
-        public static Object[] GetCustomAttributes(Type type, Type attributeType, bool inherit)
-        {
-            if (type == null || attributeType == null)
-                return new Object[0];
+        public static object[] GetCustomAttributes( Type type, Type attributeType, bool inherit ) {
+            if( type == null || attributeType == null )
+                return new object[0];
 
 #if NETSTANDARD1_3
-            IEnumerable<Attribute> attributes = type.GetTypeInfo().GetCustomAttributes(attributeType, inherit);
-            List<Object> list = new List<Object>();
-            list.AddRange(attributes);
+            var attributes = type.GetTypeInfo().GetCustomAttributes(attributeType, inherit);
+            List<object> list = [.. attributes];
 
             return list.ToArray();
 #else
-            return type.GetCustomAttributes(attributeType, inherit);
+            return type.GetCustomAttributes( attributeType, inherit );
 #endif
         }
 
@@ -152,20 +138,18 @@ namespace TeximpNet.Unmanaged
 #pragma warning disable CS0618
 #endif
 
-        public static Delegate GetDelegateForFunctionPointer(IntPtr procAddress, Type delegateType)
-        {
-            if (procAddress == IntPtr.Zero || delegateType == null)
+        public static Delegate GetDelegateForFunctionPointer( IntPtr procAddress, Type delegateType ) {
+            if( procAddress == IntPtr.Zero || delegateType == null )
                 return null;
-            
-            return Marshal.GetDelegateForFunctionPointer(procAddress, delegateType);
+
+            return Marshal.GetDelegateForFunctionPointer( procAddress, delegateType );
         }
 
-        public static IntPtr GetFunctionPointerForDelegate(Delegate func)
-        {
-            if (func == null)
+        public static IntPtr GetFunctionPointerForDelegate( Delegate func ) {
+            if( func == null )
                 return IntPtr.Zero;
 
-            return Marshal.GetFunctionPointerForDelegate(func);
+            return Marshal.GetFunctionPointerForDelegate( func );
         }
 
 #if NETSTANDARD1_3

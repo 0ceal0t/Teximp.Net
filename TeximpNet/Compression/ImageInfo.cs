@@ -19,13 +19,11 @@
 * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 * THE SOFTWARE.
 */
-namespace TeximpNet.Compression
-{
+namespace TeximpNet.Compression {
     /// <summary>
     /// Represents details about a single image such as dimensions, byte sizes, and the position of the image in a larger collection of images.
     /// </summary>
-    public struct ImageInfo
-    {
+    public struct ImageInfo {
         /// <summary>
         /// Width of the image, in texels.
         /// </summary>
@@ -60,7 +58,7 @@ namespace TeximpNet.Compression
         /// The total # of bytes that represents each depth slice of a 3D image. Data may be padded for alignment purposes, so this may not necessarily be <see cref="Width"/> x <see cref="Height"/> x sizeof(<see cref="RGBAQuad"/>).
         /// </summary>
         public int SlicePitch;
-       
+
         /// <summary>
         /// Constructs a new <see cref="ImageInfo"/>.
         /// </summary>
@@ -71,8 +69,7 @@ namespace TeximpNet.Compression
         /// <param name="mipLevel">Mipmap index of the image.</param>
         /// <param name="rowPitch"># of bytes for each scanline of the image.</param>
         /// <param name="slicePitch"># of bytes for each depth slice of the 3D image.</param>
-        public ImageInfo(int width, int height, int depth, int arrayIndex, int mipLevel, int rowPitch, int slicePitch)
-        {
+        public ImageInfo( int width, int height, int depth, int arrayIndex, int mipLevel, int rowPitch, int slicePitch ) {
             Width = width;
             Height = height;
             Depth = depth;
@@ -90,9 +87,8 @@ namespace TeximpNet.Compression
         /// <param name="mipLevel">Optional mipmap index of the image.</param>
         /// <param name="arrayIndex">Optional array index of the image.</param>
         /// <returns>Populated image info.</returns>
-        public static ImageInfo From2D(int width, int height, int mipLevel = 0, int arrayIndex = 0)
-        {
-            return From2D(width, height, 0, mipLevel, arrayIndex);
+        public static ImageInfo From2D( int width, int height, int mipLevel = 0, int arrayIndex = 0 ) {
+            return From2D( width, height, 0, mipLevel, arrayIndex );
         }
 
         /// <summary>
@@ -104,10 +100,9 @@ namespace TeximpNet.Compression
         /// <param name="mipLevel">Optional mipmap index of the image.</param>
         /// <param name="arrayIndex">Optional array index of the image.</param>
         /// <returns>Populated image info.</returns>
-        public static ImageInfo From2D(int width, int height, int rowPitch, int mipLevel = 0, int arrayIndex = 0)
-        {
+        public static ImageInfo From2D( int width, int height, int rowPitch, int mipLevel = 0, int arrayIndex = 0 ) {
             //Calculate a default row pitch w/o any padding, assume size of the pixel is a 4-component RGBA color, 32-bits total
-            if (rowPitch == 0)
+            if( rowPitch == 0 )
                 rowPitch = width * 4;
 
             ImageInfo info;
@@ -129,9 +124,8 @@ namespace TeximpNet.Compression
         /// <param name="face">Which cubemap face this image corresponds to.</param>
         /// <param name="mipLevel">Optional mipmap index of the image.</param>
         /// <returns>Populated image info.</returns>
-        public static ImageInfo FromCube(int size, CubeMapFace face, int mipLevel = 0)
-        {
-            return From2D(size, size, 0, mipLevel, (face == CubeMapFace.None) ? 0 : (int)face);
+        public static ImageInfo FromCube( int size, CubeMapFace face, int mipLevel = 0 ) {
+            return From2D( size, size, 0, mipLevel, ( face == CubeMapFace.None ) ? 0 : ( int )face );
         }
 
         /// <summary>
@@ -142,9 +136,8 @@ namespace TeximpNet.Compression
         /// <param name="rowPitch"># of bytes per scanline, may be padded.</param>
         /// <param name="mipLevel">Optional mipmap index of the image.</param>
         /// <returns>Populated image info.</returns>
-        public static ImageInfo FromCube(int size, CubeMapFace face, int rowPitch, int mipLevel = 0)
-        {
-            return From2D(size, size, rowPitch, mipLevel, (face == CubeMapFace.None) ? 0 : (int)face);
+        public static ImageInfo FromCube( int size, CubeMapFace face, int rowPitch, int mipLevel = 0 ) {
+            return From2D( size, size, rowPitch, mipLevel, ( face == CubeMapFace.None ) ? 0 : ( int )face );
         }
 
         /// <summary>
@@ -155,9 +148,8 @@ namespace TeximpNet.Compression
         /// <param name="depth">Depth of the image, in texels.</param>
         /// <param name="mipLevel">Optional mipmap index of the image.</param>
         /// <returns>Populated image info.</returns>
-        public static ImageInfo From3D(int width, int height, int depth, int mipLevel = 0)
-        {
-            return From3D(width, height, depth, 0, 0, mipLevel);
+        public static ImageInfo From3D( int width, int height, int depth, int mipLevel = 0 ) {
+            return From3D( width, height, depth, 0, 0, mipLevel );
         }
 
         /// <summary>
@@ -170,13 +162,12 @@ namespace TeximpNet.Compression
         /// <param name="slicePitch"># of bytes per depth slice, may be padded.</param>
         /// <param name="mipLevel">Optional mipmap index of the image.</param>
         /// <returns>Populated image info.</returns>
-        public static ImageInfo From3D(int width, int height, int depth, int rowPitch, int slicePitch, int mipLevel = 0)
-        {
+        public static ImageInfo From3D( int width, int height, int depth, int rowPitch, int slicePitch, int mipLevel = 0 ) {
             //Calculate a default row pitch or slice pitch w/o any padding, assume size of the pixel is a 4-component RGBA color, 32-bits total
-            if (rowPitch == 0)
+            if( rowPitch == 0 )
                 rowPitch = width * 4;
 
-            if (slicePitch == 0)
+            if( slicePitch == 0 )
                 slicePitch = width * height * 4;
 
             ImageInfo info;

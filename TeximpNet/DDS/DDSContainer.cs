@@ -25,15 +25,13 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 
-namespace TeximpNet.DDS
-{
+namespace TeximpNet.DDS {
     /// <summary>
     /// Represents a set of texture images that was loaded from a DDS file format. A number of texture types are supported, such as 1D, 2D, and 3D image data. Each <see cref="MipChain"/>
     /// collection represents a complete mipmap chain of a single face (e.g. 6 of these chains make up a cubemap). Most textures will just have a single mipmap chain.
     /// </summary>
-    [DebuggerDisplay("Dimension = {Dimension}, Format = {Format}, ArrayCount = {MipChains.Count}, MipCount = {MipChains.Count == 0 ? 0 : MipChains[0].Count}")]
-    public sealed class DDSContainer : IDisposable
-    {
+    [DebuggerDisplay( "Dimension = {Dimension}, Format = {Format}, ArrayCount = {MipChains.Count}, MipCount = {MipChains.Count == 0 ? 0 : MipChains[0].Count}" )]
+    public sealed class DDSContainer : IDisposable {
         private bool m_isDisposed;
         private List<MipChain> m_mipChains;
         private DXGIFormat m_format;
@@ -42,14 +40,11 @@ namespace TeximpNet.DDS
         /// <summary>
         /// Gets or sets the texture dimension. Cubemaps must have six entries in <see cref="MipChains"/>.
         /// </summary>
-        public TextureDimension Dimension
-        {
-            get
-            {
+        public TextureDimension Dimension {
+            get {
                 return m_dimension;
             }
-            set
-            {
+            set {
                 m_dimension = value;
             }
         }
@@ -57,14 +52,11 @@ namespace TeximpNet.DDS
         /// <summary>
         /// Gets or sets the texture format. All surfaces must have the same format.
         /// </summary>
-        public DXGIFormat Format
-        {
-            get
-            {
+        public DXGIFormat Format {
+            get {
                 return m_format;
             }
-            set
-            {
+            set {
                 m_format = value;
             }
         }
@@ -73,10 +65,8 @@ namespace TeximpNet.DDS
         /// Gets the collection of mipmap chains. Typically there will be a single mipmap chain (sometimes just containing one image, if no mipmaps). Cubemaps must have six mipmap chains,
         /// and array textures may have any number.
         /// </summary>
-        public List<MipChain> MipChains
-        {
-            get
-            {
+        public List<MipChain> MipChains {
+            get {
                 return m_mipChains;
             }
         }
@@ -84,14 +74,14 @@ namespace TeximpNet.DDS
         /// <summary>
         /// Constructs a new instance of the <see cref="DDSContainer"/> class.
         /// </summary>
-        public DDSContainer() : this(new List<MipChain>(), DXGIFormat.Unknown, TextureDimension.Two) { }
+        public DDSContainer() : this( [], DXGIFormat.Unknown, TextureDimension.Two ) { }
 
         /// <summary>
         /// Constructs a new instance of the <see cref="DDSContainer"/> class.
         /// </summary>
         /// <param name="format">Format of the image data.</param>
         /// <param name="texDim">Identifies the dimensions of the image data.</param>
-        public DDSContainer(DXGIFormat format, TextureDimension texDim) : this(new List<MipChain>(), format, texDim) { }
+        public DDSContainer( DXGIFormat format, TextureDimension texDim ) : this( [], format, texDim ) { }
 
         /// <summary>
         /// Constructs a new instance of the <see cref="DDSContainer"/> class.
@@ -99,8 +89,7 @@ namespace TeximpNet.DDS
         /// <param name="mipChains">Collection of mipmap chains.</param>
         /// <param name="format">Format of the image data.</param>
         /// <param name="texDim">Identifies the dimensions of the image data.</param>
-        public DDSContainer(List<MipChain> mipChains, DXGIFormat format, TextureDimension texDim)
-        {
+        public DDSContainer( List<MipChain> mipChains, DXGIFormat format, TextureDimension texDim ) {
             m_mipChains = mipChains;
             m_format = format;
             m_dimension = texDim;
@@ -111,9 +100,8 @@ namespace TeximpNet.DDS
         /// Validates the contained mipmap surfaces, e.g. all array main images must be the same dimensions and have the same number of mipmaps, cubemaps must have 6 faces, data/sizes must at least be in valid ranges, etc.
         /// </summary>
         /// <returns>True if the image data is not correctly initialized, false if it passes some basic checks.</returns>
-        public bool Validate()
-        {
-            return DDSFile.ValidateInternal(m_mipChains, m_format, m_dimension);
+        public bool Validate() {
+            return DDSFile.ValidateInternal( m_mipChains, m_format, m_dimension );
         }
 
         /// <summary>
@@ -122,9 +110,8 @@ namespace TeximpNet.DDS
         /// <param name="fileName">File to write to. If it doesn't exist, it will be created.</param>
         /// <param name="flags">Flags to control how the DDS data is saved.</param>
         /// <returns>True if writing the data was successful, false if otherwise.</returns>
-        public bool Write(String fileName, DDSFlags flags = DDSFlags.None)
-        {
-            return DDSFile.Write(fileName, m_mipChains, m_format, m_dimension, flags);
+        public bool Write( string fileName, DDSFlags flags = DDSFlags.None ) {
+            return DDSFile.Write( fileName, m_mipChains, m_format, m_dimension, flags );
         }
 
         /// <summary>
@@ -133,27 +120,23 @@ namespace TeximpNet.DDS
         /// <param name="output">Output stream.</param>
         /// <param name="flags">Flags to control how the DDS data is saved.</param>
         /// <returns>True if writing the data was successful, false if otherwise.</returns>
-        public bool Write(Stream output, DDSFlags flags = DDSFlags.None)
-        {
-            return DDSFile.Write(output, m_mipChains, m_format, m_dimension, flags);
-        }     
+        public bool Write( Stream output, DDSFlags flags = DDSFlags.None ) {
+            return DDSFile.Write( output, m_mipChains, m_format, m_dimension, flags );
+        }
 
         /// <summary>
         /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
         /// </summary>
-        public void Dispose()
-        {
-            Dispose(true);
+        public void Dispose() {
+            Dispose( true );
 
-            GC.SuppressFinalize(this);
+            GC.SuppressFinalize( this );
         }
 
-        private void Dispose(bool isDisposing)
-        {
-            if(!m_isDisposed)
-            {
-                if(isDisposing)
-                    DDSFile.DisposeMipChains(m_mipChains);
+        private void Dispose( bool isDisposing ) {
+            if( !m_isDisposed ) {
+                if( isDisposing )
+                    DDSFile.DisposeMipChains( m_mipChains );
 
                 m_isDisposed = true;
             }

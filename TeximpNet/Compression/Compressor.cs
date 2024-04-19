@@ -30,15 +30,13 @@ using System.Threading.Tasks;
 using TeximpNet.Unmanaged;
 using TeximpNet.DDS;
 
-namespace TeximpNet.Compression
-{
+namespace TeximpNet.Compression {
     /// <summary>
     /// A compressor processes input image data (either from a <see cref="Surface"/> or just raw image data) using the Nvidia Texture Tools
     /// API and outputs either to a file (e.g. DDS) or to memory (e.g. <see cref="DDSContainer"/>). Processing can range from mipmap creation (with a variety of filters) to compressing RGBA
     /// data into a number of GPU compressed formats.
     /// </summary>
-    public sealed class Compressor : IDisposable
-    {
+    public sealed class Compressor : IDisposable {
         private IntPtr m_compressorPtr;
         private IntPtr m_inputOptionsPtr;
         private IntPtr m_compressionOptionsPtr;
@@ -65,10 +63,8 @@ namespace TeximpNet.Compression
         /// <summary>
         /// Gets the pointer to the native object.
         /// </summary>
-        public IntPtr NativePtr
-        {
-            get
-            {
+        public IntPtr NativePtr {
+            get {
                 return m_compressorPtr;
             }
         }
@@ -76,10 +72,8 @@ namespace TeximpNet.Compression
         /// <summary>
         /// Gets if the compressor has been disposed or not.
         /// </summary>
-        public bool IsDisposed
-        {
-            get
-            {
+        public bool IsDisposed {
+            get {
                 return m_isDisposed;
             }
         }
@@ -87,10 +81,8 @@ namespace TeximpNet.Compression
         /// <summary>
         /// Gets the input options, this allows you to set input image data and a number of options for how to handle it.
         /// </summary>
-        public InputOptions Input
-        {
-            get
-            {
+        public InputOptions Input {
+            get {
                 return m_inputOptions;
             }
         }
@@ -98,10 +90,8 @@ namespace TeximpNet.Compression
         /// <summary>
         /// Gets the compression options.
         /// </summary>
-        public CompressionOptions Compression
-        {
-            get
-            {
+        public CompressionOptions Compression {
+            get {
                 return m_compressionOptions;
             }
         }
@@ -109,10 +99,8 @@ namespace TeximpNet.Compression
         /// <summary>
         /// Gets the output options, this allows you to set how the output images should be treated.
         /// </summary>
-        public OutputOptions Output
-        {
-            get
-            {
+        public OutputOptions Output {
+            get {
                 return m_outputOptions;
             }
         }
@@ -120,14 +108,11 @@ namespace TeximpNet.Compression
         /// <summary>
         /// Gets or sets if multi-threading should be used when processing images. By default, this is enabled.
         /// </summary>
-        public bool IsMultiThreadingEnabled
-        {
-            get
-            {
+        public bool IsMultiThreadingEnabled {
+            get {
                 return m_taskDispatcher.IsEnabled;
             }
-            set
-            {
+            set {
                 m_taskDispatcher.IsEnabled = value;
             }
         }
@@ -135,10 +120,8 @@ namespace TeximpNet.Compression
         /// <summary>
         /// Queries if there is an error code if the compressor failed to process.
         /// </summary>
-        public bool HasLastError
-        {
-            get
-            {
+        public bool HasLastError {
+            get {
                 return m_lastError.HasValue;
             }
         }
@@ -146,39 +129,34 @@ namespace TeximpNet.Compression
         /// <summary>
         /// Queries the last error code encountered.
         /// </summary>
-        public CompressorError LastError
-        {
-            get
-            {
-                return (m_lastError.HasValue) ? m_lastError.Value : CompressorError.Unknown;
+        public CompressorError LastError {
+            get {
+                return ( m_lastError.HasValue ) ? m_lastError.Value : CompressorError.Unknown;
             }
         }
 
         /// <summary>
         /// Queries the string message of the last error code encountered.
         /// </summary>
-        public String LastErrorString
-        {
-            get
-            {
-                return NvTextureToolsLibrary.Instance.GetErrorString(LastError);
+        public string LastErrorString {
+            get {
+                return NvTextureToolsLibrary.Instance.GetErrorString( LastError );
             }
         }
 
         /// <summary>
         /// Constructs a new instance of the <see cref="Compressor"/> class.
         /// </summary>
-        public Compressor()
-        {
+        public Compressor() {
             m_compressorPtr = NvTextureToolsLibrary.Instance.CreateCompressor();
             m_inputOptionsPtr = NvTextureToolsLibrary.Instance.CreateInputOptions();
             m_compressionOptionsPtr = NvTextureToolsLibrary.Instance.CreateCompressionOptions();
             m_outputOptionsPtr = NvTextureToolsLibrary.Instance.CreateOutputOptions();
 
-            m_inputOptions = new InputOptions(m_inputOptionsPtr);
-            m_compressionOptions = new CompressionOptions(m_compressionOptionsPtr);
-            m_outputOptions = new OutputOptions(m_outputOptionsPtr, BeginImage, OutputData, EndImage, HandleError);
-            m_taskDispatcher = new TaskDispatcher(m_compressorPtr);
+            m_inputOptions = new InputOptions( m_inputOptionsPtr );
+            m_compressionOptions = new CompressionOptions( m_compressionOptionsPtr );
+            m_outputOptions = new OutputOptions( m_outputOptionsPtr, BeginImage, OutputData, EndImage, HandleError );
+            m_taskDispatcher = new TaskDispatcher( m_compressorPtr );
 
             m_isDisposed = false;
             m_lastError = null;
@@ -187,9 +165,8 @@ namespace TeximpNet.Compression
         /// <summary>
         /// Finalizes an instance of the <see cref="Compressor"/> class.
         /// </summary>
-        ~Compressor()
-        {
-            Dispose(false);
+        ~Compressor() {
+            Dispose( false );
         }
 
         /// <summary>
@@ -197,24 +174,21 @@ namespace TeximpNet.Compression
         /// </summary>
         /// <param name="outputFileName">Output file name, if it exists the file will get overwritten.</param>
         /// <returns>True if the image was successfully processed and saved, false if otherwise.</returns>
-        public bool Process(String outputFileName)
-        {
-            if(String.IsNullOrEmpty(outputFileName))
-            {
-                HandleError(CompressorError.FileOpen);
+        public bool Process( string outputFileName ) {
+            if( string.IsNullOrEmpty( outputFileName ) ) {
+                HandleError( CompressorError.FileOpen );
                 return false;
             }
 
-            if (!m_inputOptions.HasData)
-            {
-                HandleError(CompressorError.InvalidInput);
+            if( !m_inputOptions.HasData ) {
+                HandleError( CompressorError.InvalidInput );
                 return false;
             }
 
             m_outputtingToStream = false;
-            m_outputOptions.SetOutputToFile(outputFileName);
+            m_outputOptions.SetOutputToFile( outputFileName );
 
-            return NvTextureToolsLibrary.Instance.Process(m_compressorPtr, m_inputOptionsPtr, m_compressionOptionsPtr, m_outputOptionsPtr);
+            return NvTextureToolsLibrary.Instance.Process( m_compressorPtr, m_inputOptionsPtr, m_compressionOptionsPtr, m_outputOptionsPtr );
         }
 
         /// <summary>
@@ -222,33 +196,28 @@ namespace TeximpNet.Compression
         /// </summary>
         /// <param name="stream">Output stream to write the image file to.</param>
         /// <returns>True if the image was successfully processed and outputted to the stream, false if otherwise.</returns>
-        public bool Process(Stream stream)
-        {
-            if (stream == null || !stream.CanWrite)
-            {
-                HandleError(CompressorError.FileWrite);
+        public bool Process( Stream stream ) {
+            if( stream == null || !stream.CanWrite ) {
+                HandleError( CompressorError.FileWrite );
                 return false;
             }
 
-            if (!m_inputOptions.HasData)
-            {
-                HandleError(CompressorError.InvalidInput);
+            if( !m_inputOptions.HasData ) {
+                HandleError( CompressorError.InvalidInput );
                 return false;
             }
 
             m_lastError = null;
             m_outputtingToStream = true;
-            m_outputOptions.SetOutputToMemory(true);
+            m_outputOptions.SetOutputToMemory( true );
 
             m_currentStream = stream;
             m_currentBuffer = new StreamTransferBuffer();
 
-            try
-            {
-                return NvTextureToolsLibrary.Instance.Process(m_compressorPtr, m_inputOptionsPtr, m_compressionOptionsPtr, m_outputOptionsPtr);
+            try {
+                return NvTextureToolsLibrary.Instance.Process( m_compressorPtr, m_inputOptionsPtr, m_compressionOptionsPtr, m_outputOptionsPtr );
             }
-            finally
-            {
+            finally {
                 //Make sure we don't hold onto any references
                 m_currentStream = null;
                 m_outputtingToStream = false;
@@ -264,45 +233,40 @@ namespace TeximpNet.Compression
         /// </summary>
         /// <param name="compressedImages">Container that contains all the processed images. May be null if the operation was not successful.</param>
         /// <returns>True if the image was successfully processed and outputted to a container, false if otherwise.</returns>
-        public bool Process(out DDSContainer compressedImages)
-        {
+        public bool Process( out DDSContainer compressedImages ) {
             compressedImages = null;
 
-            if (!m_inputOptions.HasData)
-            {
-                HandleError(CompressorError.InvalidInput);
+            if( !m_inputOptions.HasData ) {
+                HandleError( CompressorError.InvalidInput );
                 return false;
             }
 
             m_lastError = null;
             m_outputtingToStream = false;
-            m_outputOptions.SetOutputToMemory(true);
+            m_outputOptions.SetOutputToMemory( true );
 
-            DDSContainer ddsContainer = new DDSContainer(GetDXGIFormat(), GetTextureDimension());
+            var ddsContainer = new DDSContainer( GetDXGIFormat(), GetTextureDimension() );
             m_currentDDSContainer = ddsContainer;
             m_currentMip = null;
             m_currentBytePos = 0;
 
             //Start first face's mipchains...always has at least this one
             m_currentFace = 0;
-            ddsContainer.MipChains.Add(new MipChain());
+            ddsContainer.MipChains.Add( [] );
 
-            bool success = false;
+            var success = false;
 
-            try
-            {
-                success = NvTextureToolsLibrary.Instance.Process(m_compressorPtr, m_inputOptionsPtr, m_compressionOptionsPtr, m_outputOptionsPtr);
+            try {
+                success = NvTextureToolsLibrary.Instance.Process( m_compressorPtr, m_inputOptionsPtr, m_compressionOptionsPtr, m_outputOptionsPtr );
             }
-            finally
-            {
+            finally {
                 //Make sure we don't hold onto any references
                 m_currentDDSContainer = null;
                 m_currentMip = null;
 
                 //If an error...dispose the container
-                if(!success)
-                {
-                    System.Diagnostics.Debug.Assert(false);
+                if( !success ) {
+                    System.Diagnostics.Debug.Assert( false );
 
                     ddsContainer.Dispose();
                     ddsContainer = null;
@@ -314,82 +278,71 @@ namespace TeximpNet.Compression
         }
 
         //ErrorHandler callback
-        private void HandleError(CompressorError error)
-        {
+        private void HandleError( CompressorError error ) {
             m_lastError = error;
         }
 
         //BeginImageHandler callback
-        private void BeginImage(int size, int width, int height, int depth, int face, int mipLevel)
-        {
-            if (m_outputtingToStream)
+        private void BeginImage( int size, int width, int height, int depth, int face, int mipLevel ) {
+            if( m_outputtingToStream )
                 return;
 
             //Determine pitch information...
-            int realWidth, realHeight, rowPitch, slicePitch, bytesPerPixel;
-            ImageHelper.ComputePitch(m_currentDDSContainer.Format, width, height, out rowPitch, out slicePitch, out realWidth, out realHeight, out bytesPerPixel);
+            ImageHelper.ComputePitch( m_currentDDSContainer.Format, width, height, out var rowPitch, out var slicePitch, out _, out _, out var bytesPerPixel );
 
-            bool isCompressed = FormatConverter.IsCompressed(m_currentDDSContainer.Format);
-            if(!isCompressed)
-            {
+            var isCompressed = FormatConverter.IsCompressed( m_currentDDSContainer.Format );
+            if( !isCompressed ) {
                 //Note: We cannot change the input format to be anything other than 32-bit RGBA...
-                System.Diagnostics.Debug.Assert(bytesPerPixel == 4);
+                System.Diagnostics.Debug.Assert( bytesPerPixel == 4 );
 
                 rowPitch = bytesPerPixel * width;
                 slicePitch = rowPitch * height;
             }
 
             //Create new mip map
-            m_currentMip = new MipData(width, height, depth, rowPitch, slicePitch);
+            m_currentMip = new MipData( width, height, depth, rowPitch, slicePitch );
 
-            System.Diagnostics.Debug.Assert(m_currentMip.SizeInBytes == size);
+            System.Diagnostics.Debug.Assert( m_currentMip.SizeInBytes == size );
 
             m_currentBytePos = 0;
 
             //If new face, add a new mipchain
-            if(m_currentFace != face)
-            {
+            if( m_currentFace != face ) {
                 m_currentFace = face;
-                m_currentDDSContainer.MipChains.Add(new MipChain());
+                m_currentDDSContainer.MipChains.Add( [] );
             }
 
             //Add mipmap to last mipchain
-            m_currentDDSContainer.MipChains[m_currentDDSContainer.MipChains.Count - 1].Add(m_currentMip);
+            m_currentDDSContainer.MipChains[m_currentDDSContainer.MipChains.Count - 1].Add( m_currentMip );
         }
 
         //OutputHandler callback, if writing header, that usually is the first call before any begin-end image blocks
-        private bool OutputData(IntPtr data, int size)
-        {
-            if (m_outputtingToStream)
-            {
-                int offset = 0;
-                while(size > 0)
-                {
-                    int count = Math.Min(m_currentBuffer.Length, size);
+        private bool OutputData( IntPtr data, int size ) {
+            if( m_outputtingToStream ) {
+                var offset = 0;
+                while( size > 0 ) {
+                    var count = Math.Min( m_currentBuffer.Length, size );
                     size -= count;
-                    
-                    MemoryHelper.CopyMemory(m_currentBuffer.Pointer, MemoryHelper.AddIntPtr(data, offset), count);
+
+                    MemoryHelper.CopyMemory( m_currentBuffer.Pointer, MemoryHelper.AddIntPtr( data, offset ), count );
                     offset += count;
 
-                    m_currentBuffer.WriteBytes(m_currentStream, count);
+                    m_currentBuffer.WriteBytes( m_currentStream, count );
                 }
             }
-            else
-            {
-                if (m_currentMip != null)
-                {
-                    MemoryHelper.CopyMemory(MemoryHelper.AddIntPtr(m_currentMip.Data, m_currentBytePos), data, size);
+            else {
+                if( m_currentMip != null ) {
+                    MemoryHelper.CopyMemory( MemoryHelper.AddIntPtr( m_currentMip.Data, m_currentBytePos ), data, size );
                     m_currentBytePos += size;
                 }
             }
 
             return true;
         }
-        
+
         //EndImageHandler callback
-        private void EndImage()
-        {
-            if (m_outputtingToStream)
+        private void EndImage() {
+            if( m_outputtingToStream )
                 return;
 
             m_currentMip = null;
@@ -399,23 +352,19 @@ namespace TeximpNet.Compression
         /// <summary>
         /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
         /// </summary>
-        public void Dispose()
-        {
-            Dispose(true);
+        public void Dispose() {
+            Dispose( true );
 
-            GC.SuppressFinalize(this);
+            GC.SuppressFinalize( this );
         }
 
-        private void Dispose(bool isDisposing)
-        {
-            if(!m_isDisposed)
-            {
-                NvTextureToolsLibrary lib = NvTextureToolsLibrary.Instance;
+        private void Dispose( bool isDisposing ) {
+            if( !m_isDisposed ) {
+                var lib = NvTextureToolsLibrary.Instance;
 
-                if(isDisposing)
-                {
+                if( isDisposing ) {
                     //Make sure the function ptrs are set back to NULL
-                    m_outputOptions.SetOutputToMemory(false);
+                    m_outputOptions.SetOutputToMemory( false );
 
                     m_inputOptions = null;
                     m_compressionOptions = null;
@@ -423,29 +372,24 @@ namespace TeximpNet.Compression
                 }
 
                 //I think if we're getting called by the finalizer at the point that the lib is null, we're probably shutting down anyways...
-                if(lib != null && lib.IsLibraryLoaded)
-                {
-                    if(m_compressorPtr != IntPtr.Zero)
-                    {
-                        lib.DestroyCompressor(m_compressorPtr);
+                if( lib != null && lib.IsLibraryLoaded ) {
+                    if( m_compressorPtr != IntPtr.Zero ) {
+                        lib.DestroyCompressor( m_compressorPtr );
                         m_compressorPtr = IntPtr.Zero;
                     }
 
-                    if(m_inputOptionsPtr != IntPtr.Zero)
-                    {
-                        lib.DestroyInputOptions(m_inputOptionsPtr);
+                    if( m_inputOptionsPtr != IntPtr.Zero ) {
+                        lib.DestroyInputOptions( m_inputOptionsPtr );
                         m_inputOptionsPtr = IntPtr.Zero;
                     }
 
-                    if(m_compressionOptionsPtr != IntPtr.Zero)
-                    {
-                        lib.DestroyCompressionOptions(m_compressionOptionsPtr);
+                    if( m_compressionOptionsPtr != IntPtr.Zero ) {
+                        lib.DestroyCompressionOptions( m_compressionOptionsPtr );
                         m_compressionOptionsPtr = IntPtr.Zero;
                     }
 
-                    if(m_outputOptionsPtr != IntPtr.Zero)
-                    {
-                        lib.DestroyOutputOptions(m_outputOptionsPtr);
+                    if( m_outputOptionsPtr != IntPtr.Zero ) {
+                        lib.DestroyOutputOptions( m_outputOptionsPtr );
                         m_outputOptionsPtr = IntPtr.Zero;
                     }
                 }
@@ -454,18 +398,14 @@ namespace TeximpNet.Compression
             }
         }
 
-        private DXGIFormat GetDXGIFormat()
-        {
-            CompressionFormat format = m_compressionOptions.Format;
-            switch(format)
-            {
-                case CompressionFormat.BGRA:
-                    {
+        private DXGIFormat GetDXGIFormat() {
+            var format = m_compressionOptions.Format;
+            switch( format ) {
+                case CompressionFormat.BGRA: {
                         //Determine uncompressed format
-                        uint bpp, redMask, greenMask, blueMask, alphaMask;
-                        m_compressionOptions.GetPixelFormat(out bpp, out redMask, out greenMask, out blueMask, out alphaMask);
+                        m_compressionOptions.GetPixelFormat( out var bpp, out var redMask, out var greenMask, out var blueMask, out var alphaMask );
 
-                        return FormatConverter.DetermineDXGIFormat(bpp, redMask, greenMask, blueMask, alphaMask);
+                        return FormatConverter.DetermineDXGIFormat( bpp, redMask, greenMask, blueMask, alphaMask );
                     }
                 case CompressionFormat.BC1:
                 case CompressionFormat.BC1a:
@@ -484,12 +424,10 @@ namespace TeximpNet.Compression
             }
         }
 
-        private TextureDimension GetTextureDimension()
-        {
-            TextureType texType = m_inputOptions.TextureType;
+        private TextureDimension GetTextureDimension() {
+            var texType = m_inputOptions.TextureType;
 
-            switch(texType)
-            {
+            switch( texType ) {
                 case TextureType.Texture2D:
                 case TextureType.Texture2DArray:
                     return TextureDimension.Two;
@@ -513,8 +451,7 @@ namespace TeximpNet.Compression
         /// will use them during compression or normal map generation. If mipmaps aren't set explicitly and normal maps are generated, 
         /// the first mip is converted to a normal map, and mipmaps are generated from that.
         /// </remarks>
-        public sealed class InputOptions
-        {
+        public sealed class InputOptions {
             private IntPtr m_inputOptionsPtr;
             private TextureType m_type;
             private int m_width, m_height, m_depth, m_arrayCount;
@@ -538,10 +475,8 @@ namespace TeximpNet.Compression
             /// <summary>
             /// Gets the pointer to the native object.
             /// </summary>
-            public IntPtr NativePtr
-            {
-                get
-                {
+            public IntPtr NativePtr {
+                get {
                     return m_inputOptionsPtr;
                 }
             }
@@ -549,10 +484,8 @@ namespace TeximpNet.Compression
             /// <summary>
             /// Gets the texture type of the input image.
             /// </summary>
-            public TextureType TextureType
-            {
-                get
-                {
+            public TextureType TextureType {
+                get {
                     return m_type;
                 }
             }
@@ -560,10 +493,8 @@ namespace TeximpNet.Compression
             /// <summary>
             /// Gets the width of the input image.
             /// </summary>
-            public int Width
-            {
-                get
-                {
+            public int Width {
+                get {
                     return m_width;
                 }
             }
@@ -571,10 +502,8 @@ namespace TeximpNet.Compression
             /// <summary>
             /// Gets the height of the input image.
             /// </summary>
-            public int Height
-            {
-                get
-                {
+            public int Height {
+                get {
                     return m_height;
                 }
             }
@@ -582,10 +511,8 @@ namespace TeximpNet.Compression
             /// <summary>
             /// Gets the depth of the input image. (Typically 1 if not 3D).
             /// </summary>
-            public int Depth
-            {
-                get
-                {
+            public int Depth {
+                get {
                     return m_depth;
                 }
             }
@@ -595,21 +522,17 @@ namespace TeximpNet.Compression
             /// a cubemap then this is 6 faces (one for each side of the cube). This may be greater than one if the
             /// type is a 2D array texture (similar to cubemap, but variable # of faces). Cubemap arrays are not supported.
             /// </summary>
-            public int FaceCount
-            {
-                get
-                {
-                    return (m_type == TextureType.TextureCube) ? 6 * m_arrayCount : m_arrayCount;
+            public int FaceCount {
+                get {
+                    return ( m_type == TextureType.TextureCube ) ? 6 * m_arrayCount : m_arrayCount;
                 }
             }
 
             /// <summary>
             /// Gets the number of mipmaps that will be generated for each face.
             /// </summary>
-            public int MipmapCount
-            {
-                get
-                {
+            public int MipmapCount {
+                get {
                     return m_mipCount;
                 }
             }
@@ -618,47 +541,38 @@ namespace TeximpNet.Compression
             /// Gets or sets if mipmaps should be generated. The max level of mips will be set if mipmaps
             /// are to be generated. By default this is true.
             /// </summary>
-            public bool GenerateMipmaps
-            {
-                get
-                {
+            public bool GenerateMipmaps {
+                get {
                     return m_generateMipmaps;
                 }
-                set
-                {
-                    SetMipmapGeneration(value, -1);
+                set {
+                    SetMipmapGeneration( value, -1 );
                 }
             }
 
             /// <summary>
             /// Gets or sets the alpha mode that will be used during processing. By default this is <see cref="AlphaMode.None"/>.
             /// </summary>
-            public AlphaMode AlphaMode
-            {
-                get
-                {
+            public AlphaMode AlphaMode {
+                get {
                     return m_alphaMode;
                 }
-                set
-                {
+                set {
                     m_alphaMode = value;
-                    NvTextureToolsLibrary.Instance.SetInputOptionsAlphaMode(m_inputOptionsPtr, value);
+                    NvTextureToolsLibrary.Instance.SetInputOptionsAlphaMode( m_inputOptionsPtr, value );
                 }
             }
 
             /// <summary>
             /// Gets or sets the round mode that will be used during processing. By default this is <see cref="RoundMode.None"/>.
             /// </summary>
-            public RoundMode RoundMode
-            {
-                get
-                {
+            public RoundMode RoundMode {
+                get {
                     return m_roundMode;
                 }
-                set
-                {
+                set {
                     m_roundMode = value;
-                    NvTextureToolsLibrary.Instance.SetInputOptionsRoundMode(m_inputOptionsPtr, value);
+                    NvTextureToolsLibrary.Instance.SetInputOptionsRoundMode( m_inputOptionsPtr, value );
                 }
             }
 
@@ -666,65 +580,53 @@ namespace TeximpNet.Compression
             /// Gets or sets the maximum texture dimensions, used in conjunction with <see cref="RoundMode"/>. By
             /// default this is set to zero.
             /// </summary>
-            public int MaxTextureExtent
-            {
-                get
-                {
+            public int MaxTextureExtent {
+                get {
                     return m_maxExtent;
                 }
-                set
-                {
+                set {
                     m_maxExtent = value;
-                    NvTextureToolsLibrary.Instance.SetInputOptionsMaxExtents(m_inputOptionsPtr, value);
+                    NvTextureToolsLibrary.Instance.SetInputOptionsMaxExtents( m_inputOptionsPtr, value );
                 }
             }
 
             /// <summary>
             /// Gets or sets the filter used during mipmap generation. By default this is <see cref="MipmapFilter.Box"/>.
             /// </summary>
-            public MipmapFilter MipmapFilter
-            {
-                get
-                {
+            public MipmapFilter MipmapFilter {
+                get {
                     return m_mipFilter;
                 }
-                set
-                {
+                set {
                     m_mipFilter = value;
-                    NvTextureToolsLibrary.Instance.SetInputOptionsMipmapFilter(m_inputOptionsPtr, value);
+                    NvTextureToolsLibrary.Instance.SetInputOptionsMipmapFilter( m_inputOptionsPtr, value );
                 }
             }
 
             /// <summary>
             /// Gets or sets the wrap mode used during mipmap generation. By default this is set to <see cref="WrapMode.Mirror"/>.
             /// </summary>
-            public WrapMode WrapMode
-            {
-                get
-                {
+            public WrapMode WrapMode {
+                get {
                     return m_wrapMode;
                 }
-                set
-                {
+                set {
                     m_wrapMode = value;
-                    NvTextureToolsLibrary.Instance.SetInputOptionsWrapMode(m_inputOptionsPtr, value);
+                    NvTextureToolsLibrary.Instance.SetInputOptionsWrapMode( m_inputOptionsPtr, value );
                 }
             }
 
             /// <summary>
             /// Gets or sets if the input image is to be treated as a normal map. By default this is false.
             /// </summary>
-            public bool IsNormalMap
-            {
-                get
-                {
+            public bool IsNormalMap {
+                get {
                     return m_isNormalMap;
                 }
-                set
-                {
+                set {
                     m_isNormalMap = value;
 
-                    NvTextureToolsLibrary.Instance.SetInputOptionsNormalMap(m_inputOptionsPtr, value);
+                    NvTextureToolsLibrary.Instance.SetInputOptionsNormalMap( m_inputOptionsPtr, value );
                 }
             }
 
@@ -732,32 +634,26 @@ namespace TeximpNet.Compression
             /// Gets or sets if the mipmaps of a normal map should be renormalized after they are generated. By default
             /// this is true.
             /// </summary>
-            public bool NormalizeMipmaps
-            {
-                get
-                {
+            public bool NormalizeMipmaps {
+                get {
                     return m_normalizeMipmaps;
                 }
-                set
-                {
+                set {
                     m_normalizeMipmaps = value;
-                    NvTextureToolsLibrary.Instance.SetInputOptionsNormalizeMipmaps(m_inputOptionsPtr, value);
+                    NvTextureToolsLibrary.Instance.SetInputOptionsNormalizeMipmaps( m_inputOptionsPtr, value );
                 }
             }
 
             /// <summary>
             /// Gets or sets if the input image should be converted to a normal map.
             /// </summary>
-            public bool ConvertToNormalMap
-            {
-                get
-                {
+            public bool ConvertToNormalMap {
+                get {
                     return m_convertToNormalMap;
                 }
-                set
-                {
+                set {
                     m_convertToNormalMap = value;
-                    NvTextureToolsLibrary.Instance.SetInputOptionsConvertToNormalMap(m_inputOptionsPtr, value);
+                    NvTextureToolsLibrary.Instance.SetInputOptionsConvertToNormalMap( m_inputOptionsPtr, value );
                 }
             }
 
@@ -765,16 +661,13 @@ namespace TeximpNet.Compression
             /// Gets if the input has mipmap data, this will be true/false depending on the success of the functions to set
             /// any mipmap data. All mipmap faces (1 for Texture2D, 6 for TextureCube) need to be set for the compressor to run.
             /// </summary>
-            public bool HasData
-            {
-                get
-                {
-                    if (m_faceHasData.Count == 0)
+            public bool HasData {
+                get {
+                    if( m_faceHasData.Count == 0 )
                         return false;
 
-                    for(int i = 0; i < m_faceHasData.Count; i++)
-                    {
-                        if (!m_faceHasData[i])
+                    for( var i = 0; i < m_faceHasData.Count; i++ ) {
+                        if( !m_faceHasData[i] )
                             return false;
                     }
 
@@ -782,8 +675,7 @@ namespace TeximpNet.Compression
                 }
             }
 
-            internal InputOptions(IntPtr nativePtr)
-            {
+            internal InputOptions( IntPtr nativePtr ) {
                 m_inputOptionsPtr = nativePtr;
 
                 m_type = TextureType.Texture2D;
@@ -803,7 +695,7 @@ namespace TeximpNet.Compression
                 m_mipFilter = MipmapFilter.Box;
                 m_mipCount = 1;
                 m_maxLevel = -1;
-                m_faceHasData = new List<bool>(6);
+                m_faceHasData = new List<bool>( 6 );
 
                 m_kaiserWidth = 3;
                 m_kaiserAlpha = 4.0f;
@@ -817,7 +709,7 @@ namespace TeximpNet.Compression
                 m_blueScale = 0f;
                 m_alphaScale = 1.0f;
 
-                float denom = 1.0f + 0.5f + 0.25f + 0.125f;
+                var denom = 1.0f + 0.5f + 0.25f + 0.125f;
                 m_smallBumpFreqScale = 1.0f / denom;
                 m_mediumBumpFreqScale = 0.5f / denom;
                 m_bigBumpFreqScale = 0.25f / denom;
@@ -834,52 +726,49 @@ namespace TeximpNet.Compression
             /// <param name="height">Height of the input image.</param>
             /// <param name="depth">Optional depth of the input image, only valid for 3D textures, by default this is 1.</param>
             /// <param name="arrayCount">Optional array count, only valid for 2D array textures (cubemap arrays are not supported), by default this is 1.</param>
-            public void SetTextureLayout(TextureType type, int width, int height, int depth = 1, int arrayCount = 1)
-            {
+            public void SetTextureLayout( TextureType type, int width, int height, int depth = 1, int arrayCount = 1 ) {
                 m_type = type;
-                m_width = ImageHelper.EnsureOneOrGreater(width);
-                m_height = ImageHelper.EnsureOneOrGreater(height);
-                m_depth = ImageHelper.EnsureOneOrGreater(depth);
-                m_arrayCount = ImageHelper.EnsureOneOrGreater(arrayCount);
+                m_width = ImageHelper.EnsureOneOrGreater( width );
+                m_height = ImageHelper.EnsureOneOrGreater( height );
+                m_depth = ImageHelper.EnsureOneOrGreater( depth );
+                m_arrayCount = ImageHelper.EnsureOneOrGreater( arrayCount );
                 m_faceHasData.Clear();
 
                 //If type is not a 3D texture, depth has to be 1...
-                if(type != TextureType.Texture3D)
+                if( type != TextureType.Texture3D )
                     m_depth = 1;
 
                 //If type is not a 2D array texture, arrayCount must be 1... (cubemap arrays are possible, but not supported)
-                if(type != TextureType.Texture2DArray)
+                if( type != TextureType.Texture2DArray )
                     m_arrayCount = 1;
 
                 //Allocate face data
-                switch(type)
-                {
+                switch( type ) {
                     case TextureType.Texture2D:
                     case TextureType.Texture3D:
-                        m_faceHasData.Add(false);
+                        m_faceHasData.Add( false );
                         break;
                     case TextureType.TextureCube:
-                        for (int i = 0; i < 6; i++)
-                            m_faceHasData.Add(false);
+                        for( var i = 0; i < 6; i++ )
+                            m_faceHasData.Add( false );
                         break;
                     case TextureType.Texture2DArray:
-                        for(int i = 0; i < m_arrayCount; i++)
-                            m_faceHasData.Add(false);
+                        for( var i = 0; i < m_arrayCount; i++ )
+                            m_faceHasData.Add( false );
                         break;
                 }
 
-                if(m_generateMipmaps && m_maxLevel == -1)
-                    m_mipCount = ImageHelper.CountMipmaps(width, height, depth);
-  
-                NvTextureToolsLibrary.Instance.SetInputOptionsTextureLayout(m_inputOptionsPtr, type, m_width, m_height, m_depth, m_arrayCount);
+                if( m_generateMipmaps && m_maxLevel == -1 )
+                    m_mipCount = ImageHelper.CountMipmaps( width, height, depth );
+
+                NvTextureToolsLibrary.Instance.SetInputOptionsTextureLayout( m_inputOptionsPtr, type, m_width, m_height, m_depth, m_arrayCount );
             }
 
             /// <summary>
             /// Clears the current input image data and texture layout. This frees any image data
             /// that the input options holds onto.
             /// </summary>
-            public void ClearTextureLayout()
-            {
+            public void ClearTextureLayout() {
                 m_type = TextureType.Texture2D;
                 m_width = 0;
                 m_height = 0;
@@ -887,7 +776,7 @@ namespace TeximpNet.Compression
                 m_arrayCount = 0;
                 m_faceHasData.Clear();
 
-                NvTextureToolsLibrary.Instance.ResetInputOptionsTextureLayout(m_inputOptionsPtr);
+                NvTextureToolsLibrary.Instance.ResetInputOptionsTextureLayout( m_inputOptionsPtr );
             }
 
             /// <summary>
@@ -898,20 +787,16 @@ namespace TeximpNet.Compression
             /// <param name="isBGRA">True if the data is BGRA ordering, false if RGBA ordering.</param>
             /// <param name="imageInfo">Information describing image details such as dimension.</param>
             /// <returns>True if the data has been set, false if otherwise.</returns>
-            public bool SetMipmapData(IntPtr data, bool isBGRA, ImageInfo imageInfo)
-            {
-                if(data == IntPtr.Zero || imageInfo.Width <= 0 || imageInfo.Height <= 0 || imageInfo.MipLevel < 0 || imageInfo.ArrayIndex < 0 || imageInfo.RowPitch <= 0)
-                {
-                    System.Diagnostics.Debug.Assert(false);
+            public bool SetMipmapData( IntPtr data, bool isBGRA, ImageInfo imageInfo ) {
+                if( data == IntPtr.Zero || imageInfo.Width <= 0 || imageInfo.Height <= 0 || imageInfo.MipLevel < 0 || imageInfo.ArrayIndex < 0 || imageInfo.RowPitch <= 0 ) {
+                    System.Diagnostics.Debug.Assert( false );
                     return false;
                 }
 
                 //Check for 3D images, they must have a slice pitch
-                if(imageInfo.Depth > 1)
-                {
-                    if(imageInfo.SlicePitch <= 0)
-                    {
-                        System.Diagnostics.Debug.Assert(false);
+                if( imageInfo.Depth > 1 ) {
+                    if( imageInfo.SlicePitch <= 0 ) {
+                        System.Diagnostics.Debug.Assert( false );
                         return false;
                     }
                 }
@@ -925,57 +810,50 @@ namespace TeximpNet.Compression
                 //Compute expected pitches, the compressor expects straight up arrays of texels (at least from what I can tell), so no padding. But image sources MAY have padding,
                 //which we need to account for
 
-                bool is3D = m_type == TextureType.Texture3D;
-                int formatSize = 4; //4-byte BGRA texel
-                int rowStride = imageInfo.Width * formatSize;
+                var is3D = m_type == TextureType.Texture3D;
+                var formatSize = 4; //4-byte BGRA texel
+                var rowStride = imageInfo.Width * formatSize;
 
                 //If not 3D texture, make sure we set some well known values just in case ImageInfo isn't valid
-                int depthStride = (!is3D) ? 0 : imageInfo.Width * imageInfo.Height * formatSize;
-                int slicePitch = (!is3D) ? 0 : imageInfo.SlicePitch;
-                int depth = (!is3D) ? 1 : imageInfo.Depth;
-                
-                bool pitchesMatch = rowStride == imageInfo.RowPitch && depthStride == slicePitch;
+                var depthStride = ( !is3D ) ? 0 : imageInfo.Width * imageInfo.Height * formatSize;
+                var slicePitch = ( !is3D ) ? 0 : imageInfo.SlicePitch;
+                var depth = ( !is3D ) ? 1 : imageInfo.Depth;
 
-                IntPtr bgraPtr = data;
-                bool needsToDisposeBgraPtr = false;
+                var pitchesMatch = rowStride == imageInfo.RowPitch && depthStride == slicePitch;
 
-                if(isBGRA)
-                {
-                    if(!pitchesMatch)
-                    {
-                        bgraPtr = CopyBGRAData(data, imageInfo.Width, imageInfo.Height, depth, imageInfo.RowPitch, imageInfo.SlicePitch);
+                var bgraPtr = data;
+                var needsToDisposeBgraPtr = false;
+
+                if( isBGRA ) {
+                    if( !pitchesMatch ) {
+                        bgraPtr = CopyBGRAData( data, imageInfo.Width, imageInfo.Height, depth, imageInfo.RowPitch, imageInfo.SlicePitch );
                         needsToDisposeBgraPtr = true;
                     }
 
                     //Pitches + color order match, fastest case!
                 }
-                else
-                {
-                    if(!pitchesMatch)
-                    {
-                        bgraPtr = CopyRGBAData(data, imageInfo.Width, imageInfo.Height, depth, imageInfo.RowPitch, imageInfo.SlicePitch);
+                else {
+                    if( !pitchesMatch ) {
+                        bgraPtr = CopyRGBAData( data, imageInfo.Width, imageInfo.Height, depth, imageInfo.RowPitch, imageInfo.SlicePitch );
                         needsToDisposeBgraPtr = true;
                     }
-                    else
-                    {
-                        bgraPtr = CopyRGBAData(data, imageInfo.Width, imageInfo.Height, depth, imageInfo.RowPitch, imageInfo.SlicePitch);
+                    else {
+                        bgraPtr = CopyRGBAData( data, imageInfo.Width, imageInfo.Height, depth, imageInfo.RowPitch, imageInfo.SlicePitch );
                         needsToDisposeBgraPtr = true;
                     }
                 }
 
-                bool success = false;
+                var success = false;
 
-                try
-                {
-                    success = NvTextureToolsLibrary.Instance.SetInputOptionsMipmapData(m_inputOptionsPtr, bgraPtr, imageInfo.Width, imageInfo.Height, depth, imageInfo.ArrayIndex, imageInfo.MipLevel);
+                try {
+                    success = NvTextureToolsLibrary.Instance.SetInputOptionsMipmapData( m_inputOptionsPtr, bgraPtr, imageInfo.Width, imageInfo.Height, depth, imageInfo.ArrayIndex, imageInfo.MipLevel );
                 }
-                finally
-                {
+                finally {
                     //Set some bookkeeping in the managed side
-                    SetHasData(imageInfo.ArrayIndex, success);
+                    SetHasData( imageInfo.ArrayIndex, success );
 
-                    if (needsToDisposeBgraPtr)
-                        MemoryHelper.FreeMemory(bgraPtr);
+                    if( needsToDisposeBgraPtr )
+                        MemoryHelper.FreeMemory( bgraPtr );
                 }
 
                 return success;
@@ -989,20 +867,17 @@ namespace TeximpNet.Compression
             /// <param name="mipmapLevel">Which mipmap level the image corresponds to.</param>
             /// <param name="arrayIndex">Which array index the image corresponds to.</param>
             /// <returns>True if the data has been set, false if otherwise.</returns>
-            public bool SetMipmapData(Surface data, int mipmapLevel = 0, int arrayIndex = 0)
-            {
-                if (data == null)
+            public bool SetMipmapData( Surface data, int mipmapLevel = 0, int arrayIndex = 0 ) {
+                if( data == null )
                     return false;
 
                 //Ensure we are a 32-bit RGBA bitmap
-                Surface rgbaData = data;
-                bool needToDispose = false;
+                var rgbaData = data;
+                var needToDispose = false;
 
-                if (data.ImageType != ImageType.Bitmap || data.ColorType != ImageColorType.RGBA || data.BitsPerPixel != 32)
-                {
+                if( data.ImageType != ImageType.Bitmap || data.ColorType != ImageColorType.RGBA || data.BitsPerPixel != 32 ) {
                     rgbaData = data.Clone();
-                    if (!rgbaData.ConvertTo(ImageConversion.To32Bits))
-                    {
+                    if( !rgbaData.ConvertTo( ImageConversion.To32Bits ) ) {
                         rgbaData.Dispose();
                         return false;
                     }
@@ -1010,16 +885,14 @@ namespace TeximpNet.Compression
                     needToDispose = true;
                 }
 
-                ImageInfo imageInfo = ImageInfo.From2D(rgbaData.Width, rgbaData.Height, rgbaData.Pitch, mipmapLevel, arrayIndex);
-                bool success = false;
+                var imageInfo = ImageInfo.From2D( rgbaData.Width, rgbaData.Height, rgbaData.Pitch, mipmapLevel, arrayIndex );
+                var success = false;
 
-                try
-                {
-                    success = SetMipmapData(rgbaData.DataPtr, Surface.IsBGRAOrder, imageInfo);
+                try {
+                    success = SetMipmapData( rgbaData.DataPtr, Surface.IsBGRAOrder, imageInfo );
                 }
-                finally
-                {
-                    if (needToDispose)
+                finally {
+                    if( needToDispose )
                         rgbaData.Dispose();
                 }
 
@@ -1034,19 +907,17 @@ namespace TeximpNet.Compression
             /// <param name="face">Which cubemap face the image corresponds to.</param>
             /// <param name="mipmapLevel">Which mipmap level the image corresponds to.</param>
             /// <returns>True if the data has been set, false if otherwise.</returns>
-            public bool SetMipmapData(Surface data, CubeMapFace face, int mipmapLevel = 0)
-            {
-                if(data != null)
-                {
+            public bool SetMipmapData( Surface data, CubeMapFace face, int mipmapLevel = 0 ) {
+                if( data != null ) {
                     //Cubemaps should be square...
-                    System.Diagnostics.Debug.Assert(data.Width == data.Height);
+                    System.Diagnostics.Debug.Assert( data.Width == data.Height );
                 }
 
                 //Make sure the cubemap face is valid...
-                if (face == CubeMapFace.None)
+                if( face == CubeMapFace.None )
                     face = CubeMapFace.Positive_X;
 
-                return SetMipmapData(data, mipmapLevel, (int)face);
+                return SetMipmapData( data, mipmapLevel, ( int )face );
             }
 
             /// <summary>
@@ -1058,13 +929,12 @@ namespace TeximpNet.Compression
             /// <param name="mipLevel">Which mipmap level the image corresponds to.</param>
             /// <param name="arrayIndex">Which array index the image corresponds to.</param>
             /// <returns>True if the data has been set, false if otherwise.</returns>
-            public bool SetMipmapData(MipData data, bool isBGRA, int mipLevel = 0, int arrayIndex = 0)
-            {
-                if(data == null)
+            public bool SetMipmapData( MipData data, bool isBGRA, int mipLevel = 0, int arrayIndex = 0 ) {
+                if( data == null )
                     return false;
 
-                ImageInfo imageInfo = new ImageInfo(data.Width, data.Height, data.Depth, arrayIndex, mipLevel, data.RowPitch, data.SlicePitch);
-                return SetMipmapData(data.Data, isBGRA, imageInfo);
+                var imageInfo = new ImageInfo( data.Width, data.Height, data.Depth, arrayIndex, mipLevel, data.RowPitch, data.SlicePitch );
+                return SetMipmapData( data.Data, isBGRA, imageInfo );
             }
 
             /// <summary>
@@ -1076,20 +946,18 @@ namespace TeximpNet.Compression
             /// <param name="face">Which cubemap face the image corresponds to.</param>
             /// <param name="mipmapLevel">Which mipmap level the image corresponds to.</param>
             /// <returns>True if the data has been set, false if otherwise.</returns>
-            public bool SetMipmapData(MipData data, bool isBGRA, CubeMapFace face, int mipmapLevel = 0)
-            {
-                if(data != null)
-                {
+            public bool SetMipmapData( MipData data, bool isBGRA, CubeMapFace face, int mipmapLevel = 0 ) {
+                if( data != null ) {
                     //Cubemaps should be square...
-                    System.Diagnostics.Debug.Assert(data.Width == data.Height);
+                    System.Diagnostics.Debug.Assert( data.Width == data.Height );
                 }
 
                 //Make sure the cubemap face is valid...
-                if(face == CubeMapFace.None)
+                if( face == CubeMapFace.None )
                     face = CubeMapFace.Positive_X;
 
-                ImageInfo imageInfo = new ImageInfo(data.Width, data.Height, data.Depth, (int) face, mipmapLevel, data.RowPitch, data.SlicePitch);
-                return SetMipmapData(data.Data, isBGRA, imageInfo);
+                var imageInfo = new ImageInfo( data.Width, data.Height, data.Depth, ( int )face, mipmapLevel, data.RowPitch, data.SlicePitch );
+                return SetMipmapData( data.Data, isBGRA, imageInfo );
             }
 
             /// <summary>
@@ -1098,16 +966,15 @@ namespace TeximpNet.Compression
             /// </summary>
             /// <param name="data">Bitmap surface data, if not 32-bit RGBA, a copy will be taken and converted.</param>
             /// <returns>True if the data has been set, false if otherwise.</returns>
-            public bool SetData(Surface data)
-            {
-                if (data == null)
+            public bool SetData( Surface data ) {
+                if( data == null )
                     return false;
 
-                SetTextureLayout(TextureType.Texture2D, data.Width, data.Height, 1);
+                SetTextureLayout( TextureType.Texture2D, data.Width, data.Height, 1 );
 
-                bool success = SetMipmapData(data);
+                var success = SetMipmapData( data );
 
-                if (!success)
+                if( !success )
                     ClearTextureLayout();
 
                 return success;
@@ -1120,34 +987,30 @@ namespace TeximpNet.Compression
             /// </summary>
             /// <param name="cubeFaces">Array of bitmap surfaces, in the order of the <see cref="CubeMapFace"/> enum (+X, -X, +Y, -Y, +Z, -Z). If surfaces are not 32-bit RGBA, a copy will be taken and converted..</param>
             /// <returns>True if the data has been set, false if otherwise.</returns>
-            public bool SetData(Surface[] cubeFaces)
-            {
-                if (cubeFaces == null || cubeFaces.Length != 6)
+            public bool SetData( Surface[] cubeFaces ) {
+                if( cubeFaces == null || cubeFaces.Length != 6 )
                     return false;
 
-                Surface first = cubeFaces[0];
+                var first = cubeFaces[0];
 
                 //Must be a square image
-                if (first == null || first.Width != first.Height)
+                if( first == null || first.Width != first.Height )
                     return false;
 
-                for(int i = 1; i < cubeFaces.Length; i++)
-                {
-                    Surface next = cubeFaces[i];
-                    if (next == null)
+                for( var i = 1; i < cubeFaces.Length; i++ ) {
+                    var next = cubeFaces[i];
+                    if( next == null )
                         return false;
 
-                    if (first.Width != next.Width || first.Height != next.Height)
+                    if( first.Width != next.Width || first.Height != next.Height )
                         return false;
                 }
 
-                SetTextureLayout(TextureType.TextureCube, first.Width, first.Height, 1);
+                SetTextureLayout( TextureType.TextureCube, first.Width, first.Height, 1 );
 
-                for (int i = 0; i < cubeFaces.Length; i++)
-                {
+                for( var i = 0; i < cubeFaces.Length; i++ ) {
                     //Set each cubemap face, if errors then reset and return
-                    if(!SetMipmapData(cubeFaces[i], (CubeMapFace)i, 0))
-                    {
+                    if( !SetMipmapData( cubeFaces[i], ( CubeMapFace )i, 0 ) ) {
                         ClearTextureLayout();
                         return false;
                     }
@@ -1163,24 +1026,23 @@ namespace TeximpNet.Compression
             /// <param name="data">Bitmap surface data, if not 32-bit RGBA, a copy will be taken and converted.</param>
             /// <param name="isBGRA">True if the data is BGRA ordering, false if RGBA ordering.</param>
             /// <returns>True if the data has been set, false if otherwise.</returns>
-            public bool SetData(MipData data, bool isBGRA)
-            {
-                if(data == null)
+            public bool SetData( MipData data, bool isBGRA ) {
+                if( data == null )
                     return false;
 
-                TextureType type = TextureType.Texture2D;
-                int width = data.Width;
-                int height = data.Height;
-                int depth = data.Depth;
+                var type = TextureType.Texture2D;
+                var width = data.Width;
+                var height = data.Height;
+                var depth = data.Depth;
 
-                if(data.Depth > 1)
+                if( data.Depth > 1 )
                     type = TextureType.Texture3D;
 
-                SetTextureLayout(type, width, height, depth);
+                SetTextureLayout( type, width, height, depth );
 
-                bool success = SetMipmapData(data, isBGRA);
+                var success = SetMipmapData( data, isBGRA );
 
-                if(!success)
+                if( !success )
                     ClearTextureLayout();
 
                 return success;
@@ -1194,34 +1056,30 @@ namespace TeximpNet.Compression
             /// <param name="cubeFaces">Array of bitmap surfaces, in the order of the <see cref="CubeMapFace"/> enum (+X, -X, +Y, -Y, +Z, -Z). If surfaces are not 32-bit RGBA, a copy will be taken and converted..</param>
             /// <param name="isBGRA">True if the data is BGRA ordering, false if RGBA ordering.</param>
             /// <returns>True if the data has been set, false if otherwise.</returns>
-            public bool SetData(MipData[] cubeFaces, bool isBGRA)
-            {
-                if(cubeFaces == null || cubeFaces.Length != 6)
+            public bool SetData( MipData[] cubeFaces, bool isBGRA ) {
+                if( cubeFaces == null || cubeFaces.Length != 6 )
                     return false;
 
-                MipData first = cubeFaces[0];
+                var first = cubeFaces[0];
 
                 //Must be a square image
-                if(first == null || first.Width != first.Height)
+                if( first == null || first.Width != first.Height )
                     return false;
 
-                for(int i = 1; i < cubeFaces.Length; i++)
-                {
-                    MipData next = cubeFaces[i];
-                    if(next == null)
+                for( var i = 1; i < cubeFaces.Length; i++ ) {
+                    var next = cubeFaces[i];
+                    if( next == null )
                         return false;
 
-                    if(first.Width != next.Width || first.Height != next.Height)
+                    if( first.Width != next.Width || first.Height != next.Height )
                         return false;
                 }
 
-                SetTextureLayout(TextureType.TextureCube, first.Width, first.Height, 1);
+                SetTextureLayout( TextureType.TextureCube, first.Width, first.Height, 1 );
 
-                for(int i = 0; i < cubeFaces.Length; i++)
-                {
+                for( var i = 0; i < cubeFaces.Length; i++ ) {
                     //Set each cubemap face, if errors then reset and return
-                    if(!SetMipmapData(cubeFaces[i], isBGRA, (CubeMapFace) i, 0))
-                    {
+                    if( !SetMipmapData( cubeFaces[i], isBGRA, ( CubeMapFace )i, 0 ) ) {
                         ClearTextureLayout();
                         return false;
                     }
@@ -1237,16 +1095,15 @@ namespace TeximpNet.Compression
             /// <param name="medium">Medium parameter.</param>
             /// <param name="big">Big parameter.</param>
             /// <param name="large">Large parameter.</param>
-            public void SetNormalFilter(float small, float medium, float big, float large)
-            {
-                float total = small + medium + big + large;
+            public void SetNormalFilter( float small, float medium, float big, float large ) {
+                var total = small + medium + big + large;
 
                 m_smallBumpFreqScale = small / total;
                 m_mediumBumpFreqScale = medium / total;
                 m_bigBumpFreqScale = big / total;
                 m_largeDumpFreqScale = large / total;
 
-                NvTextureToolsLibrary.Instance.SetInputOptionsNormalFilter(m_inputOptionsPtr, small, medium, big, large);
+                NvTextureToolsLibrary.Instance.SetInputOptionsNormalFilter( m_inputOptionsPtr, small, medium, big, large );
             }
 
             /// <summary>
@@ -1256,8 +1113,7 @@ namespace TeximpNet.Compression
             /// <param name="medium">Medium parameter.</param>
             /// <param name="big">Big parameter.</param>
             /// <param name="large">Large parameter.</param>
-            public void GetNormalFilter(out float small, out float medium, out float big, out float large)
-            {
+            public void GetNormalFilter( out float small, out float medium, out float big, out float large ) {
                 small = m_smallBumpFreqScale;
                 medium = m_mediumBumpFreqScale;
                 big = m_bigBumpFreqScale;
@@ -1271,12 +1127,11 @@ namespace TeximpNet.Compression
             /// </summary>
             /// <param name="inputGamma">Input gamma</param>
             /// <param name="outputGamma">Output gamma</param>
-            public void SetGamma(float inputGamma, float outputGamma)
-            {
+            public void SetGamma( float inputGamma, float outputGamma ) {
                 m_inputGamma = inputGamma;
                 m_outputGamma = outputGamma;
 
-                NvTextureToolsLibrary.Instance.SetInputOptionsGamma(m_inputOptionsPtr, m_inputGamma, m_outputGamma);
+                NvTextureToolsLibrary.Instance.SetInputOptionsGamma( m_inputOptionsPtr, m_inputGamma, m_outputGamma );
             }
 
             /// <summary>
@@ -1284,8 +1139,7 @@ namespace TeximpNet.Compression
             /// </summary>
             /// <param name="inputGamma">Input gamma</param>
             /// <param name="outputGamma">Output gamma</param>
-            public void GetGamma(out float inputGamma, out float outputGamma)
-            {
+            public void GetGamma( out float inputGamma, out float outputGamma ) {
                 inputGamma = m_inputGamma;
                 outputGamma = m_outputGamma;
             }
@@ -1295,18 +1149,17 @@ namespace TeximpNet.Compression
             /// </summary>
             /// <param name="generateMips">True if mipmaps should be generated, false otherwise.</param>
             /// <param name="maxLevel">Optional max mip level, if -1 then the full mipmap count is determined.</param>
-            public void SetMipmapGeneration(bool generateMips, int maxLevel = -1)
-            {
+            public void SetMipmapGeneration( bool generateMips, int maxLevel = -1 ) {
                 m_generateMipmaps = generateMips;
                 m_mipCount = 1;
                 m_maxLevel = maxLevel;
 
-                if (maxLevel == -1)
-                    m_mipCount = ImageHelper.CountMipmaps(m_width, m_height, m_depth);
+                if( maxLevel == -1 )
+                    m_mipCount = ImageHelper.CountMipmaps( m_width, m_height, m_depth );
                 else
                     m_mipCount = maxLevel;
 
-                NvTextureToolsLibrary.Instance.SetInputOptionsMipmapGeneration(m_inputOptionsPtr, generateMips, maxLevel);
+                NvTextureToolsLibrary.Instance.SetInputOptionsMipmapGeneration( m_inputOptionsPtr, generateMips, maxLevel );
             }
 
             /// <summary>
@@ -1315,13 +1168,12 @@ namespace TeximpNet.Compression
             /// <param name="width">Width parameter, default is 3.0f.</param>
             /// <param name="alpha">Alpha parameter, default is 4.0f.</param>
             /// <param name="stretch">Stretch parameter, default is 1.0f.</param>
-            public void SetKaiserParameters(float width = 3.0f, float alpha = 4.0f, float stretch = 1.0f)
-            {
+            public void SetKaiserParameters( float width = 3.0f, float alpha = 4.0f, float stretch = 1.0f ) {
                 m_kaiserWidth = width;
                 m_kaiserAlpha = alpha;
                 m_kaiserStretch = stretch;
 
-                NvTextureToolsLibrary.Instance.SetInputOptionsKaiserParameters(m_inputOptionsPtr, width, alpha, stretch);
+                NvTextureToolsLibrary.Instance.SetInputOptionsKaiserParameters( m_inputOptionsPtr, width, alpha, stretch );
             }
 
             /// <summary>
@@ -1330,8 +1182,7 @@ namespace TeximpNet.Compression
             /// <param name="width">Width parameter.</param>
             /// <param name="alpha">Alpha parameter.</param>
             /// <param name="stretch">Stretch parameter.</param>
-            public void GetKaiserParameters(out float width, out float alpha, out float stretch)
-            {
+            public void GetKaiserParameters( out float width, out float alpha, out float stretch ) {
                 width = m_kaiserWidth;
                 alpha = m_kaiserAlpha;
                 stretch = m_kaiserStretch;
@@ -1345,14 +1196,13 @@ namespace TeximpNet.Compression
             /// <param name="greenScale">Scale for the green channel.</param>
             /// <param name="blueScale">Scale for the blue channel.</param>
             /// <param name="alphaScale">Scale for the alpha channel.</param>
-            public void SetHeightEvaluation(float redScale, float greenScale, float blueScale, float alphaScale)
-            {
+            public void SetHeightEvaluation( float redScale, float greenScale, float blueScale, float alphaScale ) {
                 m_redScale = redScale;
                 m_greenScale = greenScale;
                 m_blueScale = blueScale;
                 m_alphaScale = alphaScale;
 
-                NvTextureToolsLibrary.Instance.SetInputOptionsHeightEvaluation(m_inputOptionsPtr, redScale, greenScale, blueScale, alphaScale);
+                NvTextureToolsLibrary.Instance.SetInputOptionsHeightEvaluation( m_inputOptionsPtr, redScale, greenScale, blueScale, alphaScale );
             }
 
             /// <summary>
@@ -1362,40 +1212,36 @@ namespace TeximpNet.Compression
             /// <param name="greenScale">Scale for the green channel.</param>
             /// <param name="blueScale">Scale for the blue channel.</param>
             /// <param name="alphaScale">Scale for the alpha channel.</param>
-            public void GetHeightEvaluation(out float redScale, out float greenScale, out float blueScale, out float alphaScale)
-            {
+            public void GetHeightEvaluation( out float redScale, out float greenScale, out float blueScale, out float alphaScale ) {
                 redScale = m_redScale;
                 greenScale = m_greenScale;
                 blueScale = m_blueScale;
                 alphaScale = m_alphaScale;
             }
 
-            private void SetHasData(int arrayIndex, bool success)
-            {
-                if (arrayIndex >= m_faceHasData.Count)
+            private void SetHasData( int arrayIndex, bool success ) {
+                if( arrayIndex >= m_faceHasData.Count )
                     return;
 
                 m_faceHasData[arrayIndex] = success;
             }
-           
-            private unsafe IntPtr CopyBGRAData(IntPtr srcBgraPtr, int width, int height, int depth, int rowPitch, int slicePitch)
-            {
-                int formatSize = 4; //4-byte BGRA texel
+
+            private unsafe IntPtr CopyBGRAData( IntPtr srcBgraPtr, int width, int height, int depth, int rowPitch, int slicePitch ) {
+                var formatSize = 4; //4-byte BGRA texel
 
                 //Input to compressor will be a simple array of the texels, no padding (note: at least from what I can tell from NVTT docs and sourcecode!)
-                IntPtr dstBgraPtr = MemoryHelper.AllocateMemory(width * height * depth * formatSize);
-                ImageHelper.CopyColorImageData(dstBgraPtr, srcBgraPtr, rowPitch, slicePitch, width, height, depth, false);
+                var dstBgraPtr = MemoryHelper.AllocateMemory( width * height * depth * formatSize );
+                ImageHelper.CopyColorImageData( dstBgraPtr, srcBgraPtr, rowPitch, slicePitch, width, height, depth, false );
 
                 return dstBgraPtr;
             }
 
-            private unsafe IntPtr CopyRGBAData(IntPtr srcRgbaPtr, int width, int height, int depth, int rowPitch, int slicePitch)
-            {
-                int formatSize = 4; //4-byte BGRA texel
+            private unsafe IntPtr CopyRGBAData( IntPtr srcRgbaPtr, int width, int height, int depth, int rowPitch, int slicePitch ) {
+                var formatSize = 4; //4-byte BGRA texel
 
                 //Input to compressor will be a simple array of the texels, no padding (note: at least from what I can tell from NVTT docs and sourcecode!)
-                IntPtr dstBgraPtr = MemoryHelper.AllocateMemory(width * height * depth * formatSize);
-                ImageHelper.CopyColorImageData(dstBgraPtr, srcRgbaPtr, rowPitch, slicePitch, width, height, depth, true);
+                var dstBgraPtr = MemoryHelper.AllocateMemory( width * height * depth * formatSize );
+                ImageHelper.CopyColorImageData( dstBgraPtr, srcRgbaPtr, rowPitch, slicePitch, width, height, depth, true );
 
                 return dstBgraPtr;
             }
@@ -1404,8 +1250,7 @@ namespace TeximpNet.Compression
         /// <summary>
         /// Options for configuring how data is written in a <see cref="Compressor"/>.
         /// </summary>
-        public sealed class CompressionOptions
-        {
+        public sealed class CompressionOptions {
             private IntPtr m_compressionOptionsPtr;
             private CompressionFormat m_format;
             private CompressionQuality m_quality;
@@ -1418,10 +1263,8 @@ namespace TeximpNet.Compression
             /// <summary>
             /// Gets the pointer to the native object.
             /// </summary>
-            public IntPtr NativePtr
-            {
-                get
-                {
+            public IntPtr NativePtr {
+                get {
                     return m_compressionOptionsPtr;
                 }
             }
@@ -1429,37 +1272,30 @@ namespace TeximpNet.Compression
             /// <summary>
             /// Gets or sets the pixel format that images will be outputted as.
             /// </summary>
-            public CompressionFormat Format
-            {
-                get
-                {
+            public CompressionFormat Format {
+                get {
                     return m_format;
                 }
-                set
-                {
+                set {
                     m_format = value;
-                    NvTextureToolsLibrary.Instance.SetCompressionOptionsFormat(m_compressionOptionsPtr, value);
-                }
-            }
-            
-            /// <summary>
-            /// Gets or sets the compression quality.
-            /// </summary>
-            public CompressionQuality Quality
-            {
-                get
-                {
-                    return m_quality;
-                }
-                set
-                {
-                    m_quality = value;
-                    NvTextureToolsLibrary.Instance.SetCompressionOptionsQuality(m_compressionOptionsPtr, value);
+                    NvTextureToolsLibrary.Instance.SetCompressionOptionsFormat( m_compressionOptionsPtr, value );
                 }
             }
 
-            internal CompressionOptions(IntPtr nativePtr)
-            {
+            /// <summary>
+            /// Gets or sets the compression quality.
+            /// </summary>
+            public CompressionQuality Quality {
+                get {
+                    return m_quality;
+                }
+                set {
+                    m_quality = value;
+                    NvTextureToolsLibrary.Instance.SetCompressionOptionsQuality( m_compressionOptionsPtr, value );
+                }
+            }
+
+            internal CompressionOptions( IntPtr nativePtr ) {
                 m_compressionOptionsPtr = nativePtr;
 
                 //Setup defaults
@@ -1491,42 +1327,39 @@ namespace TeximpNet.Compression
             /// <param name="green_mask">Mask for the bits that correspond to the green channel.</param>
             /// <param name="blue_mask">Mask for the bits that correspond to the blue channel.</param>
             /// <param name="alpha_mask">Mask for the bits that correspond to the alpha channel.</param>
-            public void SetPixelFormat(uint bitsPerPixel, uint red_mask, uint green_mask, uint blue_mask, uint alpha_mask)
-            {
+            public void SetPixelFormat( uint bitsPerPixel, uint red_mask, uint green_mask, uint blue_mask, uint alpha_mask ) {
                 m_bitCount = bitsPerPixel;
                 m_rMask = red_mask;
                 m_gMask = green_mask;
                 m_bMask = blue_mask;
                 m_aMask = alpha_mask;
 
-                NvTextureToolsLibrary.Instance.SetCompressionOptionsPixelFormat(m_compressionOptionsPtr, bitsPerPixel, red_mask, green_mask, blue_mask, alpha_mask);
+                NvTextureToolsLibrary.Instance.SetCompressionOptionsPixelFormat( m_compressionOptionsPtr, bitsPerPixel, red_mask, green_mask, blue_mask, alpha_mask );
             }
 
             /// <summary>
             /// Sets the color output format if no block compression is set to RGBA format rather than BGRA format. Essentially this sets the
             /// masks so red and blue values are swapped.
             /// </summary>
-            public void SetRGBAPixelFormat()
-            {
-                uint alphaMask = 0xFF000000;
+            public void SetRGBAPixelFormat() {
+                var alphaMask = 0xFF000000;
                 uint blueMask = 0xFF0000;
                 uint greenMask = 0xFF00;
                 uint redMask = 0xFF;
 
-                SetPixelFormat(32, redMask, greenMask, blueMask, alphaMask);
+                SetPixelFormat( 32, redMask, greenMask, blueMask, alphaMask );
             }
 
             /// <summary>
             /// Sets the color output format if no block compression to the default BGRA format.
             /// </summary>
-            public void SetBGRAPixelFormat()
-            {
-                uint alphaMask = 0xFF000000;
+            public void SetBGRAPixelFormat() {
+                var alphaMask = 0xFF000000;
                 uint redMask = 0xFF0000;
                 uint greenMask = 0xFF00;
                 uint blueMask = 0xFF;
 
-                SetPixelFormat(32, redMask, greenMask, blueMask, alphaMask);
+                SetPixelFormat( 32, redMask, greenMask, blueMask, alphaMask );
             }
 
             /// <summary>
@@ -1537,8 +1370,7 @@ namespace TeximpNet.Compression
             /// <param name="green_mask">Mask for the bits that correspond to the green channel.</param>
             /// <param name="blue_mask">Mask for the bits that correspond to the blue channel.</param>
             /// <param name="alpha_mask">Mask for the bits that correspond to the alpha channel.</param>
-            public void GetPixelFormat(out uint bitsPerPixel, out uint red_mask, out uint green_mask, out uint blue_mask, out uint alpha_mask)
-            {
+            public void GetPixelFormat( out uint bitsPerPixel, out uint red_mask, out uint green_mask, out uint blue_mask, out uint alpha_mask ) {
                 bitsPerPixel = m_bitCount;
                 red_mask = m_rMask;
                 green_mask = m_gMask;
@@ -1556,14 +1388,13 @@ namespace TeximpNet.Compression
             /// <param name="enableAlphaDithering">True to enable alpha dithering false otherwise.</param>
             /// <param name="binaryAlpha">True to use binary alpha, false otherwise.</param>
             /// <param name="alphaThreshold">Alpha threshold, default is 127.</param>
-           public void SetQuantization(bool enableColorDithering, bool enableAlphaDithering, bool binaryAlpha, int alphaThreshold = 127)
-            {
+            public void SetQuantization( bool enableColorDithering, bool enableAlphaDithering, bool binaryAlpha, int alphaThreshold = 127 ) {
                 m_enableColorDithering = enableColorDithering;
                 m_enableAlphaDithering = enableAlphaDithering;
                 m_binaryAlpha = binaryAlpha;
                 m_alphaThreshold = alphaThreshold;
 
-                NvTextureToolsLibrary.Instance.SetCompressionOptionsQuantization(m_compressionOptionsPtr, enableColorDithering, enableAlphaDithering, binaryAlpha, alphaThreshold);
+                NvTextureToolsLibrary.Instance.SetCompressionOptionsQuantization( m_compressionOptionsPtr, enableColorDithering, enableAlphaDithering, binaryAlpha, alphaThreshold );
             }
 
             /// <summary>
@@ -1573,8 +1404,7 @@ namespace TeximpNet.Compression
             /// <param name="enableAlphaDithering">True to enable alpha dithering false otherwise.</param>
             /// <param name="binaryAlpha">True to use binary alpha, false otherwise.</param>
             /// <param name="alphaThreshold">Alpha threshold.</param>
-            public void GetQuantization(out bool enableColorDithering, out bool enableAlphaDithering, out bool binaryAlpha, out int alphaThreshold)
-            {
+            public void GetQuantization( out bool enableColorDithering, out bool enableAlphaDithering, out bool binaryAlpha, out int alphaThreshold ) {
                 enableColorDithering = m_enableColorDithering;
                 enableAlphaDithering = m_enableAlphaDithering;
                 binaryAlpha = m_binaryAlpha;
@@ -1589,14 +1419,13 @@ namespace TeximpNet.Compression
             /// <param name="green_weight">Weight for the green channel, default is 1.0.</param>
             /// <param name="blue_weight">Weight for the blue channel, default is 1.0.</param>
             /// <param name="alpha_weight">Weight for the alpha channel, default is 1.0.</param>
-            public void SetColorWeights(float red_weight, float green_weight, float blue_weight, float alpha_weight)
-            {
+            public void SetColorWeights( float red_weight, float green_weight, float blue_weight, float alpha_weight ) {
                 m_rColorWeight = red_weight;
                 m_gColorWeight = green_weight;
                 m_bColorWeight = blue_weight;
                 m_aColorWeight = alpha_weight;
 
-                NvTextureToolsLibrary.Instance.SetCompressionOptionsColorWeights(m_compressionOptionsPtr, red_weight, green_weight, blue_weight, alpha_weight);
+                NvTextureToolsLibrary.Instance.SetCompressionOptionsColorWeights( m_compressionOptionsPtr, red_weight, green_weight, blue_weight, alpha_weight );
             }
 
             /// <summary>
@@ -1606,8 +1435,7 @@ namespace TeximpNet.Compression
             /// <param name="green_weight">Weight for the green channel.</param>
             /// <param name="blue_weight">Weight for the blue channel.</param>
             /// <param name="alpha_weight">Weight for the alpha channel.</param>
-            public void GetColorWeights(out float red_weight, out float green_weight, out float blue_weight, out float alpha_weight)
-            {
+            public void GetColorWeights( out float red_weight, out float green_weight, out float blue_weight, out float alpha_weight ) {
                 red_weight = m_rColorWeight;
                 green_weight = m_gColorWeight;
                 blue_weight = m_bColorWeight;
@@ -1618,8 +1446,7 @@ namespace TeximpNet.Compression
         /// <summary>
         /// Options for how data is outputted when a <see cref="Compressor"/> is executing.
         /// </summary>
-        public sealed class OutputOptions
-        {
+        public sealed class OutputOptions {
             private IntPtr m_outputOptionsPtr;
             private BeginImageHandler m_beginCallback;
             private OutputHandler m_outputCallback;
@@ -1634,10 +1461,8 @@ namespace TeximpNet.Compression
             /// <summary>
             /// Gets the pointer to the native object.
             /// </summary>
-            public IntPtr NativePtr
-            {
-                get
-                {
+            public IntPtr NativePtr {
+                get {
                     return m_outputOptionsPtr;
                 }
             }
@@ -1646,16 +1471,13 @@ namespace TeximpNet.Compression
             /// Gets or sets if the output container (e.g. DDS file format) header is written out before
             /// any image data. By default this is true.
             /// </summary>
-            public bool OutputHeader
-            {
-                get
-                {
+            public bool OutputHeader {
+                get {
                     return m_outputHeader;
                 }
-                set
-                {
+                set {
                     m_outputHeader = value;
-                    NvTextureToolsLibrary.Instance.SetOutputOptionsOutputHeader(m_outputOptionsPtr, value);
+                    NvTextureToolsLibrary.Instance.SetOutputOptionsOutputHeader( m_outputOptionsPtr, value );
                 }
             }
 
@@ -1663,16 +1485,13 @@ namespace TeximpNet.Compression
             /// Gets or sets if the output data should be in the sRGB color space if the format supports it. By default
             /// this is false.
             /// </summary>
-            public bool IsSRGBColorSpace
-            {
-                get
-                {
+            public bool IsSRGBColorSpace {
+                get {
                     return m_isSrgbColorSpace;
                 }
-                set
-                {
+                set {
                     m_isSrgbColorSpace = value;
-                    NvTextureToolsLibrary.Instance.SetOutputOptionsSrgbFlag(m_outputOptionsPtr, value);
+                    NvTextureToolsLibrary.Instance.SetOutputOptionsSrgbFlag( m_outputOptionsPtr, value );
                 }
             }
 
@@ -1680,21 +1499,17 @@ namespace TeximpNet.Compression
             /// Gets or sets the file format of the output container if the data is to be written to disk. Default is
             /// <see cref="OutputFileFormat.DDS"/>.
             /// </summary>
-            public OutputFileFormat OutputFileFormat
-            {
-                get
-                {
+            public OutputFileFormat OutputFileFormat {
+                get {
                     return m_outputFileFormat;
                 }
-                set
-                {
+                set {
                     m_outputFileFormat = value;
-                    NvTextureToolsLibrary.Instance.SetOutputOptionsContainer(m_outputOptionsPtr, value);
+                    NvTextureToolsLibrary.Instance.SetOutputOptionsContainer( m_outputOptionsPtr, value );
                 }
             }
 
-            internal OutputOptions(IntPtr nativePtr, BeginImageHandler beginCallback, OutputHandler outputCallback, EndImageHandler endCallback, ErrorHandler errorCallback)
-            {
+            internal OutputOptions( IntPtr nativePtr, BeginImageHandler beginCallback, OutputHandler outputCallback, EndImageHandler endCallback, ErrorHandler errorCallback ) {
                 m_outputOptionsPtr = nativePtr;
 
                 m_beginCallback = beginCallback;
@@ -1702,10 +1517,10 @@ namespace TeximpNet.Compression
                 m_endCallback = endCallback;
                 m_errorCallback = errorCallback;
 
-                m_beginPtr = Marshal.GetFunctionPointerForDelegate(beginCallback);
-                m_outputPtr = Marshal.GetFunctionPointerForDelegate(outputCallback);
-                m_endPtr = Marshal.GetFunctionPointerForDelegate(m_endCallback);
-                m_errorPtr = Marshal.GetFunctionPointerForDelegate(m_errorCallback);
+                m_beginPtr = Marshal.GetFunctionPointerForDelegate( beginCallback );
+                m_outputPtr = Marshal.GetFunctionPointerForDelegate( outputCallback );
+                m_endPtr = Marshal.GetFunctionPointerForDelegate( m_endCallback );
+                m_errorPtr = Marshal.GetFunctionPointerForDelegate( m_errorCallback );
 
                 m_outputToMemory = false;
 
@@ -1715,24 +1530,22 @@ namespace TeximpNet.Compression
                 m_outputHeader = true;
             }
 
-            internal void SetOutputToFile(String fileName)
-            {
-                SetOutputToMemory(false);
+            internal void SetOutputToFile( string fileName ) {
+                SetOutputToMemory( false );
 
-                NvTextureToolsLibrary.Instance.SetOutputOptionsFileName(m_outputOptionsPtr, fileName);
+                NvTextureToolsLibrary.Instance.SetOutputOptionsFileName( m_outputOptionsPtr, fileName );
             }
 
-            internal void SetOutputToMemory(bool toMemory)
-            {
-                if (m_outputToMemory == toMemory)
+            internal void SetOutputToMemory( bool toMemory ) {
+                if( m_outputToMemory == toMemory )
                     return;
 
                 m_outputToMemory = toMemory;
 
-                if (toMemory)
-                    NvTextureToolsLibrary.Instance.SetOutputOptionsOutputHandler(m_outputOptionsPtr, m_beginPtr, m_outputPtr, m_endPtr);
+                if( toMemory )
+                    NvTextureToolsLibrary.Instance.SetOutputOptionsOutputHandler( m_outputOptionsPtr, m_beginPtr, m_outputPtr, m_endPtr );
                 else
-                    NvTextureToolsLibrary.Instance.SetOutputOptionsOutputHandler(m_outputOptionsPtr, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero);
+                    NvTextureToolsLibrary.Instance.SetOutputOptionsOutputHandler( m_outputOptionsPtr, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero );
             }
         }
 
@@ -1740,8 +1553,7 @@ namespace TeximpNet.Compression
         /// Allows for NVTT Tasks to be run on the .NET ThreadPool. The native ThreadPool implementation infinitely waits when the app 
         /// is trying to shutdown.
         /// </summary>
-        private sealed class TaskDispatcher
-        {
+        private sealed class TaskDispatcher {
             private IntPtr m_compressorPtr;
             private bool m_enabled;
             private bool m_canBeEnabled;
@@ -1749,27 +1561,22 @@ namespace TeximpNet.Compression
             private TaskDispatchFunction m_dispatchFunc;
             private IntPtr m_dispatchFuncPtr;
 
-            public bool IsEnabled
-            {
-                get
-                {
+            public bool IsEnabled {
+                get {
                     return m_enabled;
                 }
-                set
-                {
-                    if (!m_canBeEnabled)
+                set {
+                    if( !m_canBeEnabled )
                         return;
 
-                    if (m_enabled != value)
-                    {
+                    if( m_enabled != value ) {
                         m_enabled = value;
-                        EnableTaskParallelism(value);
+                        EnableTaskParallelism( value );
                     }
                 }
             }
 
-            public TaskDispatcher(IntPtr compressorPtr)
-            {
+            public TaskDispatcher( IntPtr compressorPtr ) {
                 m_compressorPtr = compressorPtr;
                 m_enabled = true;
                 m_canBeEnabled = false;
@@ -1779,67 +1586,61 @@ namespace TeximpNet.Compression
 #endif
 
                 m_dispatchFunc = TaskDispatcher.DispatchHandler;
-                m_dispatchFuncPtr = Marshal.GetFunctionPointerForDelegate(m_dispatchFunc);
+                m_dispatchFuncPtr = Marshal.GetFunctionPointerForDelegate( m_dispatchFunc );
 
                 // Turn off native ThreadPool by default
-                NvTextureToolsLibrary.Instance.EnableConcurrentTaskDispatcher(compressorPtr, false);
+                NvTextureToolsLibrary.Instance.EnableConcurrentTaskDispatcher( compressorPtr, false );
 
                 // Enable managed ThreadPool if we can
-                EnableTaskParallelism(true);
+                EnableTaskParallelism( true );
             }
 
-            private void EnableTaskParallelism(bool enabled)
-            {
-                if (!m_canBeEnabled)
+            private void EnableTaskParallelism( bool enabled ) {
+                if( !m_canBeEnabled )
                     return;
- 
-                if (enabled)
-                {
-                    NvTextureToolsLibrary.Instance.SetTaskDispatcher(m_compressorPtr, m_dispatchFuncPtr);
+
+                if( enabled ) {
+                    NvTextureToolsLibrary.Instance.SetTaskDispatcher( m_compressorPtr, m_dispatchFuncPtr );
                 }
-                else
-                {
-                    NvTextureToolsLibrary.Instance.SetTaskDispatcher(m_compressorPtr, IntPtr.Zero);
+                else {
+                    NvTextureToolsLibrary.Instance.SetTaskDispatcher( m_compressorPtr, IntPtr.Zero );
                 }
             }
 
-            private static void DispatchHandler(IntPtr task, IntPtr context, int count)
-            {
-                TaskFunction func = PlatformHelper.GetDelegateForFunctionPointer(task, typeof(TaskFunction)) as TaskFunction;
+            private static void DispatchHandler( IntPtr task, IntPtr context, int count ) {
+                var func = PlatformHelper.GetDelegateForFunctionPointer( task, typeof( TaskFunction ) ) as TaskFunction;
 
 #if NET35
-                for (int i = 0; i < count; i++)
+                for (var i = 0; i < count; i++)
                     func(context, i);
 #else
                 // Split up work among tasks on the managed ThreadPool based on the number of available processors
-                List<Task> tasks = new List<Task>();
-                int maxTasks = Environment.ProcessorCount;
-                int maxCountPerTask = Math.Max(1, (int)Math.Floor((double)count / (double)maxTasks));
-                int index = 0;
-                for (int i = 0; i < maxTasks; i++)
-                {
-                    if (index >= count)
+                List<Task> tasks = [];
+                var maxTasks = Environment.ProcessorCount;
+                var maxCountPerTask = Math.Max( 1, ( int )Math.Floor( ( double )count / ( double )maxTasks ) );
+                var index = 0;
+                for( var i = 0; i < maxTasks; i++ ) {
+                    if( index >= count )
                         break;
- 
-                    int startIndex = index;
-                    int endIndex = startIndex + maxCountPerTask;
+
+                    var startIndex = index;
+                    var endIndex = startIndex + maxCountPerTask;
                     index += maxCountPerTask;
-                    Task t = new Task(() =>
-                    {
-                        for (int indx = startIndex; indx < endIndex; indx++)
-                            func(context, indx);
-                    });
+                    var t = new Task( () => {
+                        for( var indx = startIndex; indx < endIndex; indx++ )
+                            func( context, indx );
+                    } );
 
                     t.Start();
-                    tasks.Add(t);
+                    tasks.Add( t );
                 }
 
                 // Handle any remaining work on this thread
-                for (int indx = index; indx < count; indx++)
-                    func(context, indx);
+                for( var indx = index; indx < count; indx++ )
+                    func( context, indx );
 
-                if (tasks.Count > 0)
-                    Task.WaitAll(tasks.ToArray());
+                if( tasks.Count > 0 )
+                    Task.WaitAll( tasks.ToArray() );
 #endif
             }
         }

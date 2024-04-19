@@ -22,13 +22,11 @@
 
 using System;
 
-namespace TeximpNet
-{
+namespace TeximpNet {
     /// <summary>
     /// Collection of helper methods for images.
     /// </summary>
-    public static class ImageHelper
-    {
+    public static class ImageHelper {
         /// <summary>
         /// Gets the number of mipmaps that should be in the chain where the first image has the specified width/height/depth.
         /// </summary>
@@ -36,15 +34,13 @@ namespace TeximpNet
         /// <param name="height">Height of the first image in the mipmap chain.</param>
         /// <param name="depth">Depth of the first image in the mipmap chain.</param>
         /// <returns>Number of mipmaps that can be generated for the image.</returns>
-        public static int CountMipmaps(int width, int height, int depth)
-        {
-            int mipmap = 0;
+        public static int CountMipmaps( int width, int height, int depth ) {
+            var mipmap = 0;
 
-            while (width != 1 || height != 1 || depth != 1)
-            {
-                width = Math.Max(1, width / 2);
-                height = Math.Max(1, height / 2);
-                depth = Math.Max(1, depth / 2);
+            while( width != 1 || height != 1 || depth != 1 ) {
+                width = Math.Max( 1, width / 2 );
+                height = Math.Max( 1, height / 2 );
+                depth = Math.Max( 1, depth / 2 );
                 mipmap++;
             }
 
@@ -57,10 +53,9 @@ namespace TeximpNet
         /// <param name="mipLevel">Mip map level to calculate for.</param>
         /// <param name="width">Initially the first level's width, holds the width of the mip level after function returns.</param>
         /// <param name="height">Initially the first level's height, holds the height of the mip level after function returns.</param>
-        public static void CalculateMipmapLevelDimensions(int mipLevel, ref int width, ref int height)
-        {
-            width = Math.Max(1, width >> mipLevel);
-            height = Math.Max(1, height >> mipLevel);
+        public static void CalculateMipmapLevelDimensions( int mipLevel, ref int width, ref int height ) {
+            width = Math.Max( 1, width >> mipLevel );
+            height = Math.Max( 1, height >> mipLevel );
         }
 
         /// <summary>
@@ -70,11 +65,10 @@ namespace TeximpNet
         /// <param name="width">Initially the first level's width, holds the width of the mip level after function returns.</param>
         /// <param name="height">Initially the first level's height, holds the height of the mip level after function returns.</param>
         /// <param name="depth">Initially the first level's depth, holds the depth of the mip level after function returns.</param>
-        public static void CalculateMipmapLevelDimensions(int mipLevel, ref int width, ref int height, ref int depth)
-        {
-            width = Math.Max(1, width >> mipLevel);
-            height = Math.Max(1, height >> mipLevel);
-            depth = Math.Max(1, depth >> mipLevel);
+        public static void CalculateMipmapLevelDimensions( int mipLevel, ref int width, ref int height, ref int depth ) {
+            width = Math.Max( 1, width >> mipLevel );
+            height = Math.Max( 1, height >> mipLevel );
+            depth = Math.Max( 1, depth >> mipLevel );
         }
 
         /// <summary>
@@ -82,9 +76,8 @@ namespace TeximpNet
         /// </summary>
         /// <param name="val">Value to validate</param>
         /// <returns>Value that is 1 or greater.</returns>
-        public static int EnsureOneOrGreater(int val)
-        {
-            return Math.Max(1, Math.Abs(val));
+        public static int EnsureOneOrGreater( int val ) {
+            return Math.Max( 1, Math.Abs( val ) );
         }
 
         /// <summary>
@@ -92,9 +85,8 @@ namespace TeximpNet
         /// </summary>
         /// <param name="v">Previous value.</param>
         /// <returns>Previous power of two.</returns>
-        public static int PreviousPowerOfTwo(int v)
-        {
-            return NextPowerOfTwo(v + 1) / 2;
+        public static int PreviousPowerOfTwo( int v ) {
+            return NextPowerOfTwo( v + 1 ) / 2;
         }
 
         /// <summary>
@@ -102,12 +94,11 @@ namespace TeximpNet
         /// </summary>
         /// <param name="v">Starting value.</param>
         /// <returns>Nearest power of two.</returns>
-        public static int NearestPowerOfTwo(int v)
-        {
-            int np2 = NextPowerOfTwo(v);
-            int pp2 = PreviousPowerOfTwo(v);
+        public static int NearestPowerOfTwo( int v ) {
+            var np2 = NextPowerOfTwo( v );
+            var pp2 = PreviousPowerOfTwo( v );
 
-            if (np2 - v <= v - pp2)
+            if( np2 - v <= v - pp2 )
                 return np2;
             else
                 return pp2;
@@ -118,11 +109,9 @@ namespace TeximpNet
         /// </summary>
         /// <param name="v">Starting value.</param>
         /// <returns>Next power of two.</returns>
-        public static int NextPowerOfTwo(int v)
-        {
-            int p = 1;
-            while (v > p)
-            {
+        public static int NextPowerOfTwo( int v ) {
+            var p = 1;
+            while( v > p ) {
                 p += p;
             }
             return p;
@@ -139,10 +128,8 @@ namespace TeximpNet
         /// <param name="widthCount">Compressed width, if the format is a compressed image format, otherwise the given width.</param>
         /// <param name="heightCount">Compressed height, if the format is a compressed image format, otherwise the given height.</param>
         /// <param name="legacyDword">True if need to use workaround computation for some incorrectly created DDS files based on legacy DirectDraw assumptions about pitch alignment.</param>
-        public static void ComputePitch(DDS.DXGIFormat format, int width, int height, out int rowPitch, out int slicePitch, out int widthCount, out int heightCount, bool legacyDword = false)
-        {
-            int bytesPerPixel;
-            ComputePitch(format, width, height, out rowPitch, out slicePitch, out widthCount, out heightCount, out bytesPerPixel, legacyDword);
+        public static void ComputePitch( DDS.DXGIFormat format, int width, int height, out int rowPitch, out int slicePitch, out int widthCount, out int heightCount, bool legacyDword = false ) {
+            ComputePitch( format, width, height, out rowPitch, out slicePitch, out widthCount, out heightCount, out _, legacyDword );
         }
 
         /// <summary>
@@ -157,45 +144,39 @@ namespace TeximpNet
         /// <param name="heightCount">Compressed height, if the format is a compressed image format, otherwise the given height.</param>
         /// <param name="bytesPerPixel">Gets the size of the format.</param>
         /// <param name="legacyDword">True if need to use workaround computation for some incorrectly created DDS files based on legacy DirectDraw assumptions about pitch alignment.</param>
-        public static void ComputePitch(DDS.DXGIFormat format, int width, int height, out int rowPitch, out int slicePitch, out int widthCount, out int heightCount, out int bytesPerPixel, bool legacyDword = false)
-        {
+        public static void ComputePitch( DDS.DXGIFormat format, int width, int height, out int rowPitch, out int slicePitch, out int widthCount, out int heightCount, out int bytesPerPixel, bool legacyDword = false ) {
             widthCount = width;
             heightCount = height;
 
-            if (DDS.FormatConverter.IsCompressed(format))
-            {
-                int blockSize = DDS.FormatConverter.GetCompressedBlockSize(format);
+            if( DDS.FormatConverter.IsCompressed( format ) ) {
+                var blockSize = DDS.FormatConverter.GetCompressedBlockSize( format );
 
-                widthCount = Math.Max(1, (width + 3) / 4);
-                heightCount = Math.Max(1, (height + 3) / 4);
+                widthCount = Math.Max( 1, ( width + 3 ) / 4 );
+                heightCount = Math.Max( 1, ( height + 3 ) / 4 );
 
                 rowPitch = widthCount * blockSize;
                 slicePitch = rowPitch * heightCount;
 
                 bytesPerPixel = blockSize;
             }
-            else if (DDS.FormatConverter.IsPacked(format))
-            {
-                rowPitch = ((width + 1) >> 1) * 4;
+            else if( DDS.FormatConverter.IsPacked( format ) ) {
+                rowPitch = ( ( width + 1 ) >> 1 ) * 4;
                 slicePitch = rowPitch * height;
 
-                int bitsPerPixel = DDS.FormatConverter.GetBitsPerPixel(format);
-                bytesPerPixel = Math.Max(1, bitsPerPixel / 8);
+                var bitsPerPixel = DDS.FormatConverter.GetBitsPerPixel( format );
+                bytesPerPixel = Math.Max( 1, bitsPerPixel / 8 );
             }
-            else
-            {
-                int bitsPerPixel = DDS.FormatConverter.GetBitsPerPixel(format);
-                bytesPerPixel = Math.Max(1, bitsPerPixel / 8);
+            else {
+                var bitsPerPixel = DDS.FormatConverter.GetBitsPerPixel( format );
+                bytesPerPixel = Math.Max( 1, bitsPerPixel / 8 );
 
-                if (legacyDword)
-                {
+                if( legacyDword ) {
                     //Allow for old DDS files that based pitch on certain assumptions
-                    rowPitch = ((width * bitsPerPixel + 31) / 32) * sizeof(int);
+                    rowPitch = ( ( width * bitsPerPixel + 31 ) / 32 ) * sizeof( int );
                     slicePitch = rowPitch * height;
                 }
-                else
-                {
-                    rowPitch = (width * bitsPerPixel + 7) / 8;
+                else {
+                    rowPitch = ( width * bitsPerPixel + 7 ) / 8;
                     slicePitch = rowPitch * height;
                 }
             }
@@ -213,31 +194,28 @@ namespace TeximpNet
         /// <param name="width">Width of the image, in texels.</param>
         /// <param name="height">Height of the image, in texels.</param>
         /// <param name="depth">Depth of the image, in texels.</param>
-        public static unsafe void CopyImageData(IntPtr dstPtr, int dstRowPitch, int dstSlicePitch, IntPtr srcPtr, int srcRowPitch, int srcSlicePitch, int width, int height, int depth)
-        {
+        public static unsafe void CopyImageData( IntPtr dstPtr, int dstRowPitch, int dstSlicePitch, IntPtr srcPtr, int srcRowPitch, int srcSlicePitch, int width, int height, int depth ) {
             //Amount to copy per scanline
-            int strideToCopy = Math.Min(dstRowPitch, srcRowPitch);
+            var strideToCopy = Math.Min( dstRowPitch, srcRowPitch );
 
             //Iterate for each depth
-            for (int slice = 0; slice < depth; slice++)
-            {
+            for( var slice = 0; slice < depth; slice++ ) {
                 //Start with a pointer that points to the start of the slice
-                IntPtr sPtr = srcPtr;
-                IntPtr dPtr = dstPtr;
+                var sPtr = srcPtr;
+                var dPtr = dstPtr;
 
                 //And iterate + copy each line per the height of the image
-                for (int row = 0; row < height; row++)
-                {
-                    MemoryHelper.CopyMemory(dstPtr, sPtr, strideToCopy);
+                for( var row = 0; row < height; row++ ) {
+                    MemoryHelper.CopyMemory( dstPtr, sPtr, strideToCopy );
 
                     //Advance the temporary pointers to the next scanline
-                    sPtr = MemoryHelper.AddIntPtr(sPtr, srcRowPitch);
-                    dPtr = MemoryHelper.AddIntPtr(dPtr, dstRowPitch);
+                    sPtr = MemoryHelper.AddIntPtr( sPtr, srcRowPitch );
+                    dPtr = MemoryHelper.AddIntPtr( dPtr, dstRowPitch );
                 }
 
                 //Advance the pointers by their slice pitches to get to the next image
-                srcPtr = MemoryHelper.AddIntPtr(srcPtr, srcSlicePitch);
-                dstPtr = MemoryHelper.AddIntPtr(dstPtr, dstSlicePitch);
+                srcPtr = MemoryHelper.AddIntPtr( srcPtr, srcSlicePitch );
+                dstPtr = MemoryHelper.AddIntPtr( dstPtr, dstSlicePitch );
             }
         }
 
@@ -255,31 +233,28 @@ namespace TeximpNet
         /// <param name="height">Height of the image, in texels.</param>
         /// <param name="depth">Depth of the image, in texels.</param>
         /// <param name="swizzle">Optionally swizzle first and third components.</param>
-        public static unsafe void CopyColorImageData(IntPtr dstPtr, int dstRowPitch, int dstSlicePitch, IntPtr srcPtr, int srcRowPitch, int srcSlicePitch, int width, int height, int depth, bool swizzle = false)
-        {
+        public static unsafe void CopyColorImageData( IntPtr dstPtr, int dstRowPitch, int dstSlicePitch, IntPtr srcPtr, int srcRowPitch, int srcSlicePitch, int width, int height, int depth, bool swizzle = false ) {
             //Amount to copy per scanline
-            int strideToCopy = Math.Min(dstRowPitch, srcRowPitch);
+            _ = Math.Min( dstRowPitch, srcRowPitch );
 
             //Iterate for each depth
-            for (int slice = 0; slice < depth; slice++)
-            {
+            for( var slice = 0; slice < depth; slice++ ) {
                 //Start with a pointer that points to the start of the slice
-                IntPtr sPtr = srcPtr;
-                IntPtr dPtr = dstPtr;
+                var sPtr = srcPtr;
+                var dPtr = dstPtr;
 
                 //And iterate + copy each line per the height of the image
-                for (int row = 0; row < height; row++)
-                {
-                    CopyRGBALine(dPtr, sPtr, width, swizzle);
+                for( var row = 0; row < height; row++ ) {
+                    CopyRGBALine( dPtr, sPtr, width, swizzle );
 
                     //Advance the temporary pointers to the next scanline
-                    sPtr = MemoryHelper.AddIntPtr(sPtr, srcRowPitch);
-                    dPtr = MemoryHelper.AddIntPtr(dPtr, dstRowPitch);
+                    sPtr = MemoryHelper.AddIntPtr( sPtr, srcRowPitch );
+                    dPtr = MemoryHelper.AddIntPtr( dPtr, dstRowPitch );
                 }
 
                 //Advance the pointers by their slice pitches to get to the next image
-                srcPtr = MemoryHelper.AddIntPtr(srcPtr, srcSlicePitch);
-                dstPtr = MemoryHelper.AddIntPtr(dstPtr, dstSlicePitch);
+                srcPtr = MemoryHelper.AddIntPtr( srcPtr, srcSlicePitch );
+                dstPtr = MemoryHelper.AddIntPtr( dstPtr, dstSlicePitch );
             }
         }
 
@@ -295,13 +270,12 @@ namespace TeximpNet
         /// <param name="height">Height of the image, in texels.</param>
         /// <param name="depth">Depth of the image, in texels.</param>
         /// <param name="swizzle">Optionally swizzle first and third components.</param>
-        public static unsafe void CopyColorImageData(IntPtr dstPtr, IntPtr srcPtr, int srcRowPitch, int srcSlicePitch, int width, int height, int depth, bool swizzle = false)
-        {
-            int formatSize = 4; //4-byte RGBA texel
-            int dstRowPitch = formatSize * width;
-            int dstSlicePitch = dstRowPitch * height;
+        public static unsafe void CopyColorImageData( IntPtr dstPtr, IntPtr srcPtr, int srcRowPitch, int srcSlicePitch, int width, int height, int depth, bool swizzle = false ) {
+            var formatSize = 4; //4-byte RGBA texel
+            var dstRowPitch = formatSize * width;
+            var dstSlicePitch = dstRowPitch * height;
 
-            CopyColorImageData(dstPtr, dstRowPitch, dstSlicePitch, srcPtr, srcRowPitch, srcSlicePitch, width, height, depth, swizzle);
+            CopyColorImageData( dstPtr, dstRowPitch, dstSlicePitch, srcPtr, srcRowPitch, srcSlicePitch, width, height, depth, swizzle );
         }
 
         /// <summary>
@@ -312,28 +286,25 @@ namespace TeximpNet
         /// <param name="srcPtr">Source memory location.</param>
         /// <param name="width">Number of texels in the scanline.</param>
         /// <param name="swizzle">Optionally swizzle first and third components.</param>
-        public static unsafe void CopyRGBALine(IntPtr dstPtr, IntPtr srcPtr, int width, bool swizzle = false)
-        {
-            if (!swizzle)
-            {
-                MemoryHelper.CopyMemory(dstPtr, srcPtr, width * 4);
+        public static unsafe void CopyRGBALine( IntPtr dstPtr, IntPtr srcPtr, int width, bool swizzle = false ) {
+            if( !swizzle ) {
+                MemoryHelper.CopyMemory( dstPtr, srcPtr, width * 4 );
                 return;
             }
 
-            byte* dPtr = (byte*) dstPtr.ToPointer();
-            byte* sPtr = (byte*) srcPtr.ToPointer();
+            var dPtr = ( byte* )dstPtr.ToPointer();
+            var sPtr = ( byte* )srcPtr.ToPointer();
 
-            for(int i = 0, byteIndex = 0; i < width; i++, byteIndex += 4)
-            {
-                int index0 = byteIndex;
-                int index1 = byteIndex + 1;
-                int index2 = byteIndex + 2;
-                int index3 = byteIndex + 3;
+            for( int i = 0, byteIndex = 0; i < width; i++, byteIndex += 4 ) {
+                var index0 = byteIndex;
+                var index1 = byteIndex + 1;
+                var index2 = byteIndex + 2;
+                var index3 = byteIndex + 3;
 
-                byte t0 = sPtr[index0];
-                byte t1 = sPtr[index1];
-                byte t2 = sPtr[index2];
-                byte t3 = sPtr[index3];
+                var t0 = sPtr[index0];
+                var t1 = sPtr[index1];
+                var t2 = sPtr[index2];
+                var t3 = sPtr[index3];
 
                 //Swap t0 and t2
                 dPtr[index0] = t2;

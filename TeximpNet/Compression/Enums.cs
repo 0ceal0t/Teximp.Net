@@ -20,13 +20,11 @@
 * THE SOFTWARE.
 */
 
-namespace TeximpNet.Compression
-{
+namespace TeximpNet.Compression {
     /// <summary>
     /// Enumerates output formats for the <see cref="Compressor"/>.
     /// </summary>
-    public enum CompressionFormat
-    {
+    public enum CompressionFormat {
         /// <summary>
         /// Output in a non-compressed color format. By setting the pixel layout both RGBA and BGRA order or any arbitrary pixel format is possible.
         /// </summary>
@@ -177,8 +175,7 @@ namespace TeximpNet.Compression
     /// Enumerates what happens when evaluating the color of texels near an image's border
     /// during mipmap generation, as most filters will sample outside the texture.
     /// </summary>
-    public enum WrapMode
-    {
+    public enum WrapMode {
         /// <summary>
         /// Sampling outside texture range will use the color at the border.
         /// </summary>
@@ -199,8 +196,7 @@ namespace TeximpNet.Compression
     /// <summary>
     /// Enumerates texture layouts for input data.
     /// </summary>
-    public enum TextureType
-    {
+    public enum TextureType {
         /// <summary>
         /// Input data is a 2D texture.
         /// </summary>
@@ -225,8 +221,7 @@ namespace TeximpNet.Compression
     /// <summary>
     /// Enumerates filter algorithms used by the <see cref="Compressor"/> for mipmap generation.
     /// </summary>
-    public enum MipmapFilter
-    {
+    public enum MipmapFilter {
         /// <summary>
         /// A polyphase box filter. It's the default option and good choice for most cases. It's also much faster than the other filters.
         /// </summary>
@@ -246,8 +241,7 @@ namespace TeximpNet.Compression
     /// <summary>
     /// Enumerates quality of compressing image data.
     /// </summary>
-    public enum CompressionQuality
-    {
+    public enum CompressionQuality {
         /// <summary>
         /// Least quality, but fastest processing time. Results may be reasonable,
         /// but is not considered to be real-time either.
@@ -275,8 +269,7 @@ namespace TeximpNet.Compression
     /// <summary>
     /// Enumerates options for if an image is resized so it's dimensions are a power of two.
     /// </summary>
-    public enum RoundMode
-    {
+    public enum RoundMode {
         /// <summary>
         /// No resizing.
         /// </summary>
@@ -317,8 +310,7 @@ namespace TeximpNet.Compression
     /// Enumerates how alpha data is handled during processing. Transparency can influence
     /// how mipmaps and compression are handled.
     /// </summary>
-    public enum AlphaMode
-    {
+    public enum AlphaMode {
         /// <summary>
         /// Alpha and color channels are processed independently.
         /// </summary>
@@ -339,8 +331,7 @@ namespace TeximpNet.Compression
     /// Enumerates the faces of a cubemap texture. Faces are always stored in a list in the order of the enum values
     /// (e.g. Positive_X is index 0, and so on).
     /// </summary>
-    public enum CubeMapFace
-    {
+    public enum CubeMapFace {
         /// <summary>
         /// Surface is not a cubemap face.
         /// </summary>
@@ -381,8 +372,7 @@ namespace TeximpNet.Compression
     /// Format of input data for the compressor. (NOTE: High level C# API currently
     /// only operates on 8-bit RGBA/BGRA data, this is only exposed for the unmanaged API).
     /// </summary>
-    public enum InputFormat
-    {
+    public enum InputFormat {
         /// <summary>
         /// BGRA order 4 channels 8-bit integers.
         /// </summary>
@@ -407,8 +397,7 @@ namespace TeximpNet.Compression
     /// <summary>
     /// Output file format if a compressor is writing results to the disk.
     /// </summary>
-    public enum OutputFileFormat
-    {
+    public enum OutputFileFormat {
         /// <summary>
         /// DirectDrawSurface format (widely supported).
         /// </summary>
@@ -428,8 +417,7 @@ namespace TeximpNet.Compression
     /// <summary>
     /// Error codes for errors that can happen when a compressor is executed.
     /// </summary>
-    public enum CompressorError
-    {
+    public enum CompressorError {
         /// <summary>
         /// No error or unknown.
         /// </summary>

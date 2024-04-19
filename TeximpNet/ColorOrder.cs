@@ -20,13 +20,11 @@
 * THE SOFTWARE.
 */
 
-namespace TeximpNet
-{
+namespace TeximpNet {
     /// <summary>
     /// Defines the default color order properties that FreeImage expects image data to conform to by default.
     /// </summary>
-    public struct ColorOrder
-    {
+    public struct ColorOrder {
         /// <summary>
         /// Little endian BGRA red mask.
         /// </summary>
@@ -176,13 +174,11 @@ namespace TeximpNet
         /// Constructs a new <see cref="ColorOrder"/>.
         /// </summary>
         /// <param name="isLittleEndian">True if the platform is little endian, false if big endian.</param>
-        public ColorOrder(bool isLittleEndian)
-        {
+        public ColorOrder( bool isLittleEndian ) {
             IsBGRAOrder = isLittleEndian;
 
             //Assume endianness is coupled with BGRA order...it can be changed, but the library doesn't give us a nice way of checking it.
-            if(isLittleEndian)
-            {
+            if( isLittleEndian ) {
                 RedIndex = 2;
                 GreenIndex = 1;
                 BlueIndex = 0;
@@ -198,8 +194,7 @@ namespace TeximpNet
                 BlueShift = 0;
                 AlphaShift = 24;
             }
-            else
-            {
+            else {
                 RedIndex = 2;
                 GreenIndex = 1;
                 BlueIndex = 0;

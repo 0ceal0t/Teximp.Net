@@ -22,13 +22,11 @@
 
 using System;
 
-namespace TeximpNet.DDS
-{
+namespace TeximpNet.DDS {
     /// <summary>
     /// Enumerates well-known DXGI formats. See https://msdn.microsoft.com/en-us/library/windows/desktop/bb173059(v=vs.85).aspx.
     /// </summary>
-    public enum DXGIFormat : uint
-    {
+    public enum DXGIFormat : uint {
         /// <summary>
         /// Format is unknown.
         /// </summary>
@@ -631,8 +629,7 @@ namespace TeximpNet.DDS
     /// Flags for handling reading and writing DDS files.
     /// </summary>
     [Flags]
-    public enum DDSFlags
-    {
+    public enum DDSFlags {
         /// <summary>
         /// No flags.
         /// </summary>
@@ -673,8 +670,7 @@ namespace TeximpNet.DDS
     /// <summary>
     /// Represents the dimensions (W x H x D) of an image. 
     /// </summary>
-    public enum TextureDimension
-    {
+    public enum TextureDimension {
         /// <summary>
         /// 1D texture that has width.
         /// </summary>

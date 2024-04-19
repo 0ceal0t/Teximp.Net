@@ -24,33 +24,29 @@ using System;
 using System.IO;
 using System.Runtime.InteropServices;
 
-namespace TeximpNet.Unmanaged
-{
+namespace TeximpNet.Unmanaged {
     /// <summary>
     /// Resolves unmanaged DLLs for <see cref="UnmanagedLibrary"/>. The process is completely configurable, where the user can supply alternative library names (e.g. versioned libs),
-    /// an override library name, and probing paths. These can be set for both 32/64 bit, or seperately for 32 or 64 bit. See <see cref="UnmanagedLibraryResolver.ResolveLibraryPath(string)"/>
+    /// an override library name, and probing paths. These can be set for both 32/64 bit, or seperately for 32 or 64 bit. See <see cref="ResolveLibraryPath(string)"/>
     /// for the search strategy.
     /// </summary>
-    public sealed class UnmanagedLibraryResolver
-    {
-        private String[] m_32BitLibNames;
-        private String[] m_64BitLibNames;
+    public sealed class UnmanagedLibraryResolver {
+        private string[] m_32BitLibNames;
+        private string[] m_64BitLibNames;
 
-        private String[] m_32BitProbingPaths;
-        private String[] m_64BitProbingPaths;
+        private string[] m_32BitProbingPaths;
+        private string[] m_64BitProbingPaths;
 
-        private String m_override32BitName;
-        private String m_override64BitName;
+        private string m_override32BitName;
+        private string m_override64BitName;
 
         private Platform m_platform;
 
         /// <summary>
         /// Gets the platform that the application is running on. 
         /// </summary>
-        public Platform Platform
-        {
-            get
-            {
+        public Platform Platform {
+            get {
                 return m_platform;
             }
         }
@@ -59,8 +55,7 @@ namespace TeximpNet.Unmanaged
         /// Constructs a new instance of the <see cref="UnmanagedLibraryResolver"/> class.
         /// </summary>
         /// <param name="platformHint">Platform we're resolving binaries for.</param>
-        internal UnmanagedLibraryResolver(Platform platformHint)
-        {
+        internal UnmanagedLibraryResolver( Platform platformHint ) {
             m_platform = platformHint;
         }
 
@@ -68,8 +63,7 @@ namespace TeximpNet.Unmanaged
         /// Sets the collection of fallback library names (e.g. versioned libs) for 32-bit probing.
         /// </summary>
         /// <param name="fallbackLibNames">Null to clear, or set of fallback library names.</param>
-        public void SetFallbackLibraryNames32(params String[] fallbackLibNames)
-        {
+        public void SetFallbackLibraryNames32( params string[] fallbackLibNames ) {
             m_32BitLibNames = fallbackLibNames;
         }
 
@@ -77,8 +71,7 @@ namespace TeximpNet.Unmanaged
         /// Sets the collection of fallback library names (e.g. versioned libs) for 64-bit probing.
         /// </summary>
         /// <param name="fallbackLibNames">Null to clear, or set of fallback library names.</param>
-        public void SetFallbackLibraryNames64(params String[] fallbackLibNames)
-        {
+        public void SetFallbackLibraryNames64( params string[] fallbackLibNames ) {
             m_64BitLibNames = fallbackLibNames;
         }
 
@@ -86,8 +79,7 @@ namespace TeximpNet.Unmanaged
         /// Sets the collection of fallback library names (e.g. versioned libs) for both 32-bit and 64-bit probing.
         /// </summary>
         /// <param name="fallbackLibNames">Null to clear, or set of fallback library names.</param>
-        public void SetFallbackLibraryNames(params String[] fallbackLibNames)
-        {
+        public void SetFallbackLibraryNames( params string[] fallbackLibNames ) {
             m_32BitLibNames = fallbackLibNames;
             m_64BitLibNames = fallbackLibNames;
         }
@@ -97,8 +89,7 @@ namespace TeximpNet.Unmanaged
         /// that they are given.
         /// </summary>
         /// <param name="probingPaths">Null to clear, or set of paths to probe.</param>
-        public void SetProbingPaths32(params String[] probingPaths)
-        {
+        public void SetProbingPaths32( params string[] probingPaths ) {
             m_32BitProbingPaths = probingPaths;
         }
 
@@ -107,8 +98,7 @@ namespace TeximpNet.Unmanaged
         /// that they are given.
         /// </summary>
         /// <param name="probingPaths">Null to clear, or set of paths to probe.</param>
-        public void SetProbingPaths64(params String[] probingPaths)
-        {
+        public void SetProbingPaths64( params string[] probingPaths ) {
             m_64BitProbingPaths = probingPaths;
         }
 
@@ -117,8 +107,7 @@ namespace TeximpNet.Unmanaged
         /// that they are given.
         /// </summary>
         /// <param name="probingPaths">Null to clear, or set of paths to probe.</param>
-        public void SetProbingPaths(params String[] probingPaths)
-        {
+        public void SetProbingPaths( params string[] probingPaths ) {
             m_32BitProbingPaths = probingPaths;
             m_64BitProbingPaths = probingPaths;
         }
@@ -129,8 +118,7 @@ namespace TeximpNet.Unmanaged
         /// to be loaded is not conforming to the platform's default prefix/extension scheme (e.g. libXYZ.so on linux where "lib" is the prefix and ".so" the extension).
         /// </summary>
         /// <param name="overrideName">Null to clear, or override library name.</param>
-        public void SetOverrideLibraryName32(String overrideName)
-        {
+        public void SetOverrideLibraryName32( string overrideName ) {
             m_override32BitName = overrideName;
         }
 
@@ -140,8 +128,7 @@ namespace TeximpNet.Unmanaged
         /// to be loaded is not conforming to the platform's default prefix/extension scheme (e.g. libXYZ.so on linux where "lib" is the prefix and ".so" the extension).
         /// </summary>
         /// <param name="overrideName">Null to clear, or override library name.</param>
-        public void SetOverrideLibraryName64(String overrideName)
-        {
+        public void SetOverrideLibraryName64( string overrideName ) {
             m_override64BitName = overrideName;
         }
 
@@ -151,8 +138,7 @@ namespace TeximpNet.Unmanaged
         /// to be loaded is not conforming to the platform's default prefix/extension scheme (e.g. libXYZ.so on linux where "lib" is the prefix and ".so" the extension).
         /// </summary>
         /// <param name="overrideName">Null to clear, or override library name.</param>
-        public void SetOverrideLibraryName(String overrideName)
-        {
+        public void SetOverrideLibraryName( string overrideName ) {
             m_override32BitName = overrideName;
             m_override64BitName = overrideName;
         }
@@ -176,124 +162,112 @@ namespace TeximpNet.Unmanaged
         /// </summary>
         /// <param name="libName">Name of the library to attempt to resolve.</param>
         /// <returns>Full file path to the library, or the file name if not found (e.g. "libXYZ.so").</returns>
-        public String ResolveLibraryPath(String libName)
-        {
+        public string ResolveLibraryPath( string libName ) {
             //Determine bitness to control which names + paths we use
-            bool is64Bit = UnmanagedLibrary.Is64Bit;
+            var is64Bit = UnmanagedLibrary.Is64Bit;
 
             //If any override name, replace incoming name with that
-            String overrideName = (is64Bit) ? m_override64BitName : m_override32BitName;
-            if(!String.IsNullOrEmpty(overrideName))
+            var overrideName = ( is64Bit ) ? m_override64BitName : m_override32BitName;
+            if( !string.IsNullOrEmpty( overrideName ) )
                 libName = overrideName;
 
             //If incoming lib name does not exist, abort
-            if(String.IsNullOrEmpty(libName))
+            if( string.IsNullOrEmpty( libName ) )
                 return libName;
 
             //Pick fallbacks and proving paths
-            String[] fallbackNames = (is64Bit) ? m_64BitLibNames : m_32BitLibNames;
-            String[] probingPaths = (is64Bit) ? m_64BitProbingPaths : m_32BitProbingPaths;
-            String rid = GetRuntimeIdentifier();
+            var fallbackNames = ( is64Bit ) ? m_64BitLibNames : m_32BitLibNames;
+            var probingPaths = ( is64Bit ) ? m_64BitProbingPaths : m_32BitProbingPaths;
+            var rid = GetRuntimeIdentifier();
 
-            return ResolveLibraryPathInternal(libName, rid, fallbackNames, probingPaths);
+            return ResolveLibraryPathInternal( libName, rid, fallbackNames, probingPaths );
         }
 
-        private String ResolveLibraryPathInternal(String libName, String rid, String[] fallbackNames, String[] probingPaths)
-        {
+        private string ResolveLibraryPathInternal( string libName, string rid, string[] fallbackNames, string[] probingPaths ) {
             //Check user-specified probing paths
-            if(probingPaths != null)
-            {
-                foreach(String probingPath in probingPaths)
-                {
-                    String potentialPath = TryGetExistingFile(probingPath, libName, fallbackNames);
-                    if(!String.IsNullOrEmpty(potentialPath))
+            if( probingPaths != null ) {
+                foreach( var probingPath in probingPaths ) {
+                    var potentialPath = TryGetExistingFile( probingPath, libName, fallbackNames );
+                    if( !string.IsNullOrEmpty( potentialPath ) )
                         return potentialPath;
                 }
             }
 
             //Check runtimes folder based on RID
-            String runtimeFolder = Path.Combine(PlatformHelper.GetAppBaseDirectory(), Path.Combine("runtimes", Path.Combine(rid, "native")));
-            if(Directory.Exists(runtimeFolder))
-            {
-                String potentialPath = TryGetExistingFile(runtimeFolder, libName, fallbackNames);
-                if(!String.IsNullOrEmpty(potentialPath))
+            var runtimeFolder = Path.Combine( PlatformHelper.GetAppBaseDirectory(), Path.Combine( "runtimes", Path.Combine( rid, "native" ) ) );
+            if( Directory.Exists( runtimeFolder ) ) {
+                var potentialPath = TryGetExistingFile( runtimeFolder, libName, fallbackNames );
+                if( !string.IsNullOrEmpty( potentialPath ) )
                     return potentialPath;
             }
 
             //Check base directory
-            String pathInAppFolder = TryGetExistingFile(PlatformHelper.GetAppBaseDirectory(), libName, fallbackNames);
-            if(!String.IsNullOrEmpty(pathInAppFolder))
+            var pathInAppFolder = TryGetExistingFile( PlatformHelper.GetAppBaseDirectory(), libName, fallbackNames );
+            if( !string.IsNullOrEmpty( pathInAppFolder ) )
                 return pathInAppFolder;
 
             //Check nuget path
-            String nugetRidFolder = GetPackageRuntimeFolder(GetNugetPackagePath(), rid);
-            String pathInNugetCache = TryGetExistingFile(nugetRidFolder, libName, fallbackNames);
-            if(!String.IsNullOrEmpty(pathInNugetCache))
+            var nugetRidFolder = GetPackageRuntimeFolder( GetNugetPackagePath(), rid );
+            var pathInNugetCache = TryGetExistingFile( nugetRidFolder, libName, fallbackNames );
+            if( !string.IsNullOrEmpty( pathInNugetCache ) )
                 return pathInNugetCache;
 
             //Resolve failed, just return the lib name as we received it and hope the OS can resolve it
             return libName;
         }
 
-        private String GetPackageRuntimeFolder(String packagePath, String rid)
-        {
-            if(String.IsNullOrEmpty(packagePath))
+        private string GetPackageRuntimeFolder( string packagePath, string rid ) {
+            if( string.IsNullOrEmpty( packagePath ) )
                 return null;
 
-            return Path.Combine(packagePath, Path.Combine("runtimes", Path.Combine(rid, "native")));
+            return Path.Combine( packagePath, Path.Combine( "runtimes", Path.Combine( rid, "native" ) ) );
         }
 
-        private String GetNugetPackagePath()
-        {
+        private string GetNugetPackagePath() {
             //Resolve packageId based on assembly informational version
-            String packageId = PlatformHelper.GetAssemblyName().ToLowerInvariant();
-            String packageVersion = PlatformHelper.GetInformationalVersion();
-            if(String.IsNullOrEmpty(packageId) || String.IsNullOrEmpty(packageVersion))
+            var packageId = PlatformHelper.GetAssemblyName().ToLowerInvariant();
+            var packageVersion = PlatformHelper.GetInformationalVersion();
+            if( string.IsNullOrEmpty( packageId ) || string.IsNullOrEmpty( packageVersion ) )
                 return null;
 
-            String nugetPackage = Path.Combine(packageId, packageVersion);
+            var nugetPackage = Path.Combine( packageId, packageVersion );
 
             //Check if a non-default path is set as an environment variable
-            String packageDir = Environment.GetEnvironmentVariable("NUGET_PACKAGES");
+            var packageDir = Environment.GetEnvironmentVariable( "NUGET_PACKAGES" );
 
             //Make sure its valid and exists, otherwise we'll try the default location
-            if(!String.IsNullOrEmpty(packageDir) && Directory.Exists(packageDir))
-                return Path.Combine(packageDir, nugetPackage);
+            if( !string.IsNullOrEmpty( packageDir ) && Directory.Exists( packageDir ) )
+                return Path.Combine( packageDir, nugetPackage );
 
             //Build a path to the default cache in the user's folder
-            if(m_platform == Platform.Windows)
-            {
-                packageDir = Environment.GetEnvironmentVariable("USERPROFILE");
+            if( m_platform == Platform.Windows ) {
+                packageDir = Environment.GetEnvironmentVariable( "USERPROFILE" );
             }
-            else
-            {
-                packageDir = Environment.GetEnvironmentVariable("HOME");
+            else {
+                packageDir = Environment.GetEnvironmentVariable( "HOME" );
             }
 
-            if(!String.IsNullOrEmpty(packageDir))
-                return Path.Combine(packageDir, Path.Combine(Path.Combine(".nuget", "packages"), nugetPackage));
+            if( !string.IsNullOrEmpty( packageDir ) )
+                return Path.Combine( packageDir, Path.Combine( Path.Combine( ".nuget", "packages" ), nugetPackage ) );
 
             return null;
         }
 
-        private String TryGetExistingFile(String basePath, String libName, String[] fallbackNames)
-        {
+        private string TryGetExistingFile( string basePath, string libName, string[] fallbackNames ) {
             //Do not attempt if the base directory does not exist
-            if(String.IsNullOrEmpty(basePath) || !Directory.Exists(basePath))
+            if( string.IsNullOrEmpty( basePath ) || !Directory.Exists( basePath ) )
                 return null;
 
             //Check the initial lib name
-            String combinedPath = Path.Combine(basePath, libName);
-            if(File.Exists(combinedPath))
+            var combinedPath = Path.Combine( basePath, libName );
+            if( File.Exists( combinedPath ) )
                 return combinedPath;
 
             //If not found, fallback to any other names
-            if(fallbackNames != null)
-            {
-                foreach(String fallbackName in fallbackNames)
-                {
-                    combinedPath = Path.Combine(basePath, fallbackName);
-                    if(File.Exists(combinedPath))
+            if( fallbackNames != null ) {
+                foreach( var fallbackName in fallbackNames ) {
+                    combinedPath = Path.Combine( basePath, fallbackName );
+                    if( File.Exists( combinedPath ) )
                         return combinedPath;
                 }
             }
@@ -301,15 +275,12 @@ namespace TeximpNet.Unmanaged
             return null;
         }
 
-        private String GetRuntimeIdentifier()
-        {
-            return String.Format("{0}-{1}", GetRIDOS(), GetRIDArch());
+        private string GetRuntimeIdentifier() {
+            return string.Format( "{0}-{1}", GetRIDOS(), GetRIDArch() );
         }
 
-        private String GetRIDOS()
-        {
-            switch(m_platform)
-            {
+        private string GetRIDOS() {
+            switch( m_platform ) {
                 case Platform.Windows:
                     return "win";
                 case Platform.Mac:
@@ -321,8 +292,7 @@ namespace TeximpNet.Unmanaged
             return "unknown";
         }
 
-        private String GetRIDArch()
-        {
+        private string GetRIDArch() {
 #if NETSTANDARD1_3
             switch(RuntimeInformation.ProcessArchitecture)
             {
